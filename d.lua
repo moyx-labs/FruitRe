@@ -1,5 +1,3 @@
-getgenv().key = ''
-
 --------------------------------- Initial Setup ---------------------------------
 repeat task.wait() until game:IsLoaded() and game.Players and game.Players.LocalPlayer and game.Players.LocalPlayer.Character
 if not getgenv().key or getgenv().key == '' and getgenv().key == "" then end
