@@ -27,36 +27,47 @@ local function checkHookTamper()
 end
 
 --------------------------------- Anti-Crack for gethwid Executors ---------------------------------
+local function generateSecureKey(data)
+    if not data or type(data) ~= "string" then print("❌ Invalid Data for Key!") return "" end
+    local seed = os.time() + game.PlaceId + Players.LocalPlayer.UserId
+    local key = ""
+    for i = 1, #data do
+        local char = string.byte(data, i) or 0
+        key = key .. string.char(bit32.bxor(char, bit32.bxor(seed, i) % 256))
+    end
+    return key
+end
+
 local secureHttp = {}
 local secureMt = {
     __call = function(_, req)
         if not checkHookTamper() then return nil end
-        if type(OriginalHttpFunc) ~= "function" or pcall(OriginalHttpFunc, {Url = "https://example.com", Method = "GET"}) == false then 
-            print("❌ HTTP Function Corrupted!") 
-            return nil 
-        end
-        if req.Url and req.Method and string.match(req.Url, "^https://api%-proxy%.phuset%-zzii%.workers%.dev") then
+        if type(OriginalHttpFunc) ~= "function" or pcall(OriginalHttpFunc, {Url = "https://example.com", Method = "GET"}) == false then print("❌ HTTP Function Corrupted!") return nil end
+        if req.Url and req.Method and string.match(req.Url, "^https://eusxbcbwyhjtfjplwtst%.supabase%.co/rest/v1/") then
+            local encodedReq = {
+                Url = req.Url, -- No need to encode URL for Supabase
+                Method = req.Method,
+                Headers = req.Headers,
+                Body = req.Body
+            }
             local response = OriginalHttpFunc(req)
-            if response and response.StatusCode and (response.StatusCode < 200 or response.StatusCode >= 400) then 
-                print("❌ Invalid Response Status: " .. tostring(response.StatusCode)) 
-                return nil 
+            if response and response.StatusCode and (response.StatusCode < 200 or response.StatusCode >= 400) then
+                print("❌ Invalid Response Status: " .. tostring(response.StatusCode))
+                return nil
             end
             return response
         else 
-            print("❌ Invalid HTTP Request! Must use Worker URL")
+            print("❌ Invalid HTTP Request! Must use Supabase URL")
             return nil 
         end
     end,
     __index = function() return nil end,
     __newindex = function() print("❌ Attempt to Modify Secure HTTP!") return nil end
 }
-if hasGetHwid then 
-    setmetatable(secureHttp, secureMt) 
-    HttpRequestFunc = secureHttp 
-end
+if hasGetHwid then setmetatable(secureHttp, secureMt) HttpRequestFunc = secureHttp end
 
 local function generateChecksum()
-    local code = tostring(checkHookTamper) .. tostring(dummyCheck)
+    local code = tostring(generateSecureKey) .. tostring(checkHookTamper) .. tostring(dummyCheck)
     local sum = 0
     for i = 1, #code do
         sum = sum + string.byte(code, i)
@@ -97,15 +108,18 @@ local function getFingerprint(allowexec)
 end
 
 --------------------------------- Check Whitelist ---------------------------
-local workerUrl = "https://api-proxy.phuset-zzii.workers.dev"
+local supabaseUrl = "https://eusxbcbwyhjtfjplwtst.supabase.co/rest/v1/"
+local supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1c3hiY2J3eWhqdGZqcGx3dHN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQzNTEzOTksImV4cCI6MjA1OTkyNzM5OX0.d6DTqwlZ4X69orabNA0tzxrucsnVv531dqzUcsxum6E"
 local HttpService = game:GetService("HttpService")
 
 local function updateHwid(key, hwid, exploit)
-    local requestUrl = workerUrl .. "/rest/v1/keys?key=eq." .. key
+    local requestUrl = supabaseUrl .. "keys?key=eq." .. key
     local response = HttpRequestFunc({
         Url = requestUrl,
         Method = "PATCH",
         Headers = {
+            ["Authorization"] = "Bearer " .. supabaseKey,
+            ["apikey"] = supabaseKey,
             ["Content-Type"] = "application/json",
             ["Prefer"] = "return=minimal"
         },
@@ -115,33 +129,17 @@ local function updateHwid(key, hwid, exploit)
             status = "Active"
         })
     })
-    if not response then
-        print("❌ Failed to Activate Key: No response from server")
-        return false
-    end
-    if response.StatusCode == 500 then
-        print("❌ Failed to Activate Key: Internal Server Error (check Workers logs)")
-        return false
-    elseif response.StatusCode == 401 then
-        print("❌ Failed to Activate Key: Unauthorized (check Workers backend)")
-        return false
-    elseif response.StatusCode == 403 then
-        print("❌ Failed to Activate Key: Forbidden (check Supabase permissions)")
-        return false
-    elseif response.StatusCode == 200 or response.StatusCode == 204 then
-        return true
-    else
-        print("❌ Failed to Activate Key: Status " .. tostring(response.StatusCode))
-        return false
-    end
+    return response and (response.StatusCode == 200 or response.StatusCode == 204)
 end
 
 local function logUsage(key, hwid, exploit, userId)
-    local requestUrl = workerUrl .. "/rest/v1/logs"
+    local requestUrl = supabaseUrl .. "logs"
     local response = HttpRequestFunc({
         Url = requestUrl,
         Method = "POST",
         Headers = {
+            ["Authorization"] = "Bearer " .. supabaseKey,
+            ["apikey"] = supabaseKey,
             ["Content-Type"] = "application/json"
         },
         Body = HttpService:JSONEncode({
@@ -152,22 +150,7 @@ local function logUsage(key, hwid, exploit, userId)
             used_at = os.date("!%Y-%m-%dT%H:%M:%SZ")
         })
     })
-    if not response then
-        print("❌ Failed to Log Usage: No response")
-        return false
-    end
-    if response.StatusCode == 500 then
-        print("❌ Failed to Log Usage: Internal Server Error (check Workers logs)")
-        return false
-    elseif response.StatusCode == 401 then
-        print("❌ Failed to Log Usage: Unauthorized")
-        return false
-    elseif response.StatusCode == 201 then
-        return true
-    else
-        print("❌ Failed to Log Usage: Status " .. tostring(response.StatusCode))
-        return false
-    end
+    return response and response.StatusCode == 201
 end
 
 local function checkKey()
@@ -178,31 +161,20 @@ local function checkKey()
     
     if key == "" then print("❌ Key?") return false, nil, nil end
 
-    local requestUrl = workerUrl .. "/rest/v1/keys?key=eq." .. key
+    local requestUrl = supabaseUrl .. "keys?key=eq." .. key
     local response = HttpRequestFunc({
         Url = requestUrl,
         Method = "GET",
         Headers = {
+            ["Authorization"] = "Bearer " .. supabaseKey,
+            ["apikey"] = supabaseKey,
             ["Content-Type"] = "application/json"
         }
     })
-    if not response or not response.Body then 
-        print("❌ Failed to Fetch: Data (Status: " .. (response and response.StatusCode or "No response") .. ")")
-        return false, nil, nil 
-    end
-    if response.StatusCode == 500 then
-        print("❌ Failed to Fetch Key: Internal Server Error (check Workers logs)")
-        return false, nil, nil
-    elseif response.StatusCode == 401 then
-        print("❌ Failed to Fetch Key: Unauthorized")
-        return false, nil, nil
-    end
+    if not response or not response.Body then print("❌ Failed to Fetch: Data") return false, nil, nil end
 
     local data = HttpService:JSONDecode(response.Body)
-    if not data or type(data) ~= "table" or #data == 0 then 
-        print("❌ Key Not Found!")
-        return false, nil, nil 
-    end
+    if not data or type(data) ~= "table" or #data == 0 then print("❌ Key Not Found!") return false, nil, nil end
 
     local keyData = data[1]
     local status = keyData.status
@@ -243,7 +215,6 @@ local function checkKey()
             return false, nil, nil
         end
     else 
-        print("❌ Invalid Key Status: " .. tostring(status))
         return false, nil, nil 
     end
 end
@@ -252,25 +223,17 @@ local function checkUserLock()
     if not verifyIntegrity() or not checkEnvTamper() then return false end
     local userId = player.UserId
     local charName = player.Name
-    local requestUrl = workerUrl .. "/rest/v1/locked_users?user_id=eq." .. userId
+    local requestUrl = supabaseUrl .. "locked_users?user_id=eq." .. userId
     local response = HttpRequestFunc({
         Url = requestUrl,
         Method = "GET",
         Headers = {
+            ["Authorization"] = "Bearer " .. supabaseKey,
+            ["apikey"] = supabaseKey,
             ["Content-Type"] = "application/json"
         }
     })
-    if not response or not response.Body then 
-        print("❌ Failed to Fetch: LData (Status: " .. (response and response.StatusCode or "No response") .. ")")
-        return false 
-    end
-    if response.StatusCode == 500 then
-        print("❌ Failed to Fetch Locked Users: Internal Server Error (check Workers logs)")
-        return false
-    elseif response.StatusCode == 401 then
-        print("❌ Failed to Fetch Locked Users: Unauthorized")
-        return false
-    end
+    if not response or not response.Body then print("❌ Failed to Fetch: LData") return false end
 
     local data = HttpService:JSONDecode(response.Body)
     if not data or type(data) ~= "table" then return false end
@@ -309,7 +272,7 @@ if not performWhitelistCheck() then return end
 
 ------------------------------ ScriptHere -------------------------------------
 
-
+-- The rest of the script (teleport, pathfinding, dungeon logic) remains unchanged
 local TeleportService = game:GetService("TeleportService")
 local PathfindingService = game:GetService("PathfindingService")
 
@@ -550,28 +513,28 @@ elseif game.PlaceId == 139511259501829 then
         print("Moving to Start position")
         moveToPosition(startCFrame.Position)
         
-spawn(function()
-    for i = 1, #config do
-        print("Moving to Target" .. i .. ": Level " .. dungeonLevel .. " Difficulty " .. dmode)
-        moveToPosition(config[i].Position)
-    end
+        spawn(function()
+            for i = 1, #config do
+                print("Moving to Target" .. i .. ": Level " .. dungeonLevel .. " Difficulty " .. dmode)
+                moveToPosition(config[i].Position)
+            end
 
-    local lastPoint = #config
-    if lastPoint > 1 then
-        while true do
-            wait(12) 
-            print("Returning: Target " .. lastPoint .. " -> Target " .. (lastPoint - 1) .. " -> Target " .. lastPoint)
-            moveToPosition(config[lastPoint - 1].Position) 
-            moveToPosition(config[lastPoint].Position) 
-        end
-    else
-        while true do
-            wait(12)
-            print("Staying at Target " .. lastPoint .. ": Level " .. dungeonLevel .. " Difficulty " .. dmode)
-        end
+            local lastPoint = #config
+            if lastPoint > 1 then
+                while true do
+                    wait(12) 
+                    print("Returning: Target " .. lastPoint .. " -> Target " .. (lastPoint - 1) .. " -> Target " .. lastPoint)
+                    moveToPosition(config[lastPoint - 1].Position) 
+                    moveToPosition(config[lastPoint].Position) 
+                end
+            else
+                while true do
+                    wait(12)
+                    print("Staying at Target " .. lastPoint .. ": Level " .. dungeonLevel .. " Difficulty " .. dmode)
+                end
+            end
+        end)
     end
-end)
-end
     local playerGui = player:WaitForChild("PlayerGui", 10)
     if playerGui then
         local function tryTeleport()
