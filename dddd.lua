@@ -27,17 +27,6 @@ local function checkHookTamper()
 end
 
 --------------------------------- Anti-Crack for gethwid Executors ---------------------------------
-local function generateSecureKey(data)
-    if not data or type(data) ~= "string" then print("❌ Invalid Data for Key!") return "" end
-    local seed = os.time() + game.PlaceId + Players.LocalPlayer.UserId
-    local key = ""
-    for i = 1, #data do
-        local char = string.byte(data, i) or 0
-        key = key .. string.char(bit32.bxor(char, bit32.bxor(seed, i) % 256))
-    end
-    return key
-end
-
 local secureHttp = {}
 local secureMt = {
     __call = function(_, req)
@@ -47,16 +36,7 @@ local secureMt = {
             return nil 
         end
         if req.Url and req.Method and string.match(req.Url, "^https://api%-proxy%.phuset%-zzii%.workers%.dev") then
-            local encodedReq = {
-                Url = generateSecureKey(req.Url),
-                Method = req.Method,
-                Headers = req.Headers,
-                Body = req.Body and generateSecureKey(req.Body) or nil
-            }
             local response = OriginalHttpFunc(req)
-            if response and response.Body then 
-                response.Body = generateSecureKey(response.Body) 
-            end
             if response and response.StatusCode and (response.StatusCode < 200 or response.StatusCode >= 400) then 
                 print("❌ Invalid Response Status: " .. tostring(response.StatusCode)) 
                 return nil 
@@ -76,7 +56,7 @@ if hasGetHwid then
 end
 
 local function generateChecksum()
-    local code = tostring(generateSecureKey) .. tostring(checkHookTamper) .. tostring(dummyCheck)
+    local code = tostring(checkHookTamper) .. tostring(dummyCheck)
     local sum = 0
     for i = 1, #code do
         sum = sum + string.byte(code, i)
@@ -139,11 +119,14 @@ local function updateHwid(key, hwid, exploit)
         print("❌ Failed to Activate Key: No response from server")
         return false
     end
-    if response.StatusCode == 401 then
+    if response.StatusCode == 500 then
+        print("❌ Failed to Activate Key: Internal Server Error (check Workers logs)")
+        return false
+    elseif response.StatusCode == 401 then
         print("❌ Failed to Activate Key: Unauthorized (check Workers backend)")
         return false
     elseif response.StatusCode == 403 then
-        print("❌ Failed to Activate Key: Forbidden (check Workers or Supabase permissions)")
+        print("❌ Failed to Activate Key: Forbidden (check Supabase permissions)")
         return false
     elseif response.StatusCode == 200 or response.StatusCode == 204 then
         return true
@@ -173,11 +156,18 @@ local function logUsage(key, hwid, exploit, userId)
         print("❌ Failed to Log Usage: No response")
         return false
     end
-    if response.StatusCode == 401 then
+    if response.StatusCode == 500 then
+        print("❌ Failed to Log Usage: Internal Server Error (check Workers logs)")
+        return false
+    elseif response.StatusCode == 401 then
         print("❌ Failed to Log Usage: Unauthorized")
         return false
+    elseif response.StatusCode == 201 then
+        return true
+    else
+        print("❌ Failed to Log Usage: Status " .. tostring(response.StatusCode))
+        return false
     end
-    return response and response.StatusCode == 201
 end
 
 local function checkKey()
@@ -200,13 +190,15 @@ local function checkKey()
         print("❌ Failed to Fetch: Data (Status: " .. (response and response.StatusCode or "No response") .. ")")
         return false, nil, nil 
     end
-    if response.StatusCode == 401 then
+    if response.StatusCode == 500 then
+        print("❌ Failed to Fetch Key: Internal Server Error (check Workers logs)")
+        return false, nil, nil
+    elseif response.StatusCode == 401 then
         print("❌ Failed to Fetch Key: Unauthorized")
         return false, nil, nil
     end
 
-    local decodedBody = hasGetHwid and generateSecureKey(response.Body) or response.Body
-    local data = HttpService:JSONDecode(decodedBody)
+    local data = HttpService:JSONDecode(response.Body)
     if not data or type(data) ~= "table" or #data == 0 then 
         print("❌ Key Not Found!")
         return false, nil, nil 
@@ -272,13 +264,15 @@ local function checkUserLock()
         print("❌ Failed to Fetch: LData (Status: " .. (response and response.StatusCode or "No response") .. ")")
         return false 
     end
-    if response.StatusCode == 401 then
+    if response.StatusCode == 500 then
+        print("❌ Failed to Fetch Locked Users: Internal Server Error (check Workers logs)")
+        return false
+    elseif response.StatusCode == 401 then
         print("❌ Failed to Fetch Locked Users: Unauthorized")
         return false
     end
 
-    local decodedBody = hasGetHwid and generateSecureKey(response.Body) or response.Body
-    local data = HttpService:JSONDecode(decodedBody)
+    local data = HttpService:JSONDecode(response.Body)
     if not data or type(data) ~= "table" then return false end
     if #data == 0 then return true end
     local reason = (data[1] and data[1].reason) or "DM Discord: Moyx#5001"
