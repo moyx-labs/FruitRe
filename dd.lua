@@ -43,11 +43,15 @@ local function updateHwid(key, hwid, exploit)
         Body = body
     })
     if not response then
-        print("❌ updateHwid: No response")
+        print("❌ updateHwid: No response from Worker")
         return false
     end
     print("updateHwid Status: " .. tostring(response.StatusCode))
     print("updateHwid Body: " .. tostring(response.Body))
+    if response.StatusCode >= 400 then
+        print("❌ updateHwid: Error " .. response.StatusCode)
+        return false
+    end
     return response.StatusCode == 200 or response.StatusCode == 204
 end
 
@@ -69,11 +73,15 @@ local function logUsage(key, hwid, exploit, userId)
         Body = body
     })
     if not response then
-        print("❌ logUsage: No response")
+        print("❌ logUsage: No response from Worker")
         return false
     end
     print("logUsage Status: " .. tostring(response.StatusCode))
     print("logUsage Body: " .. tostring(response.Body))
+    if response.StatusCode >= 400 then
+        print("❌ logUsage: Error " .. response.StatusCode)
+        return false
+    end
     return response.StatusCode == 201
 end
 
@@ -124,7 +132,7 @@ local function checkKey()
     if not success then
         print("❌ checkKey: JSON decode error: " .. tostring(data))
         return false, nil, nil
-    end
+    }
     
     if not data or type(data) ~= "table" or #data == 0 then
         print("❌ Key not found!")
@@ -215,7 +223,7 @@ local function checkUserLock()
     if not success then
         print("❌ checkUserLock: JSON decode error: " .. tostring(data))
         return false
-    end
+    }
     
     if not data or type(data) ~= "table" then
         print("❌ checkUserLock: Invalid response data")
