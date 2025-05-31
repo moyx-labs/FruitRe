@@ -1,13 +1,14 @@
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local TweenService = game:GetService("TweenInfo")
+local TweenService = game:GetService("TweenService")
 
 -- Create GUI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = LocalPlayer.PlayerGui
 ScreenGui.Name = "AnimeFruitGUI"
 ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = true
 
 -- Main Frame (Horizontal)
 local Frame = Instance.new("Frame")
@@ -17,6 +18,7 @@ Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
 Frame.ClipsDescendants = true
+Frame.Visible = true
 
 -- Apply corner radius
 local UICorner = Instance.new("UICorner")
@@ -51,13 +53,14 @@ end)
 
 -- Title Label with Enhanced Animation
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(0, 150, 0, 40)
-Title.Position = UDim2.new(0, 10, 0, 10)
+Title.Size = UDim2.new(0, 200, 0, 40)
+Title.Position = UDim2.new(0.5, -100, 0, 10)
 Title.BackgroundTransparency = 1
 Title.Text = "AnimeFruit"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 24
 Title.Font = Enum.Font.FredokaOne
+Title.TextXAlignment = Enum.TextXAlignment.Center
 Title.Parent = Frame
 
 -- Title animation (pulsing + color shift)
@@ -69,10 +72,10 @@ local function animateTitle()
 end
 animateTitle()
 
--- Close Button (Moved further from title)
+-- Close Button
 local CloseButton = Instance.new("TextButton")
 CloseButton.Size = UDim2.new(0, 30, 0, 30)
-CloseButton.Position = UDim2.new(1, -50, 0, 10)
+CloseButton.Position = UDim2.new(1, -40, 0, 10)
 CloseButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 CloseButton.Text = "X"
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -91,7 +94,7 @@ end)
 -- Gem Button
 local GemButton = Instance.new("TextButton")
 GemButton.Size = UDim2.new(0, 100, 0, 40)
-GemButton.Position = UDim2.new(0, 10, 0, 60)
+GemButton.Position = UDim2.new(0.5, -110, 0.5, -20)
 GemButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 GemButton.Text = "Gem 99k"
 GemButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -106,7 +109,7 @@ GemUICorner.Parent = GemButton
 -- Coins Button
 local CoinsButton = Instance.new("TextButton")
 CoinsButton.Size = UDim2.new(0, 100, 0, 40)
-CoinsButton.Position = UDim2.new(0, 120, 0, 60)
+CoinsButton.Position = UDim2.new(0.5, 10, 0.5, -20)
 CoinsButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 CoinsButton.Text = "Coins 100M"
 CoinsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -121,17 +124,18 @@ CoinsUICorner.Parent = CoinsButton
 -- Creator Label with Enhanced Animation
 local Creator = Instance.new("TextLabel")
 Creator.Size = UDim2.new(0, 200, 0, 30)
-Creator.Position = UDim2.new(0, 10, 1, -40)
+Creator.Position = UDim2.new(0.5, -100, 1, -40)
 Creator.BackgroundTransparency = 1
 Creator.Text = "Mo Iamchuasawad"
 Creator.TextColor3 = Color3.fromRGB(255, 255, 255)
 Creator.TextSize = 16
 Creator.Font = Enum.Font.FredokaOne
+Creator.TextXAlignment = Enum.TextXAlignment.Center
 Creator.Parent = Frame
 
 -- Creator animation (slide + glow)
 local function animateCreator()
-    local posTween = TweenService:Create(Creator, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Position = UDim2.new(0, 20, 1, -40)})
+    local posTween = TweenService:Create(Creator, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Position = UDim2.new(0.5, -90, 1, -40)})
     local colorTween = TweenService:Create(Creator, TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(255, 200, 255)})
     posTween:Play()
     colorTween:Play()
