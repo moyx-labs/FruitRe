@@ -454,13 +454,6 @@ Title.Font = Enum.Font.FredokaOne
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Frame
 
--- Title animation (smooth pulsing size only)
-local function animateTitle()
-    local sizeTween = TweenService:Create(Title, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextSize = 26})
-    sizeTween:Play()
-end
-animateTitle()
-
 -- Close Button
 local CloseButton = Instance.new("TextButton")
 CloseButton.Size = UDim2.new(0, 30, 0, 30)
