@@ -51,7 +51,7 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
--- Title Label with Enhanced Animation
+-- Title Label with Smooth Animation
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(0, 200, 0, 40)
 Title.Position = UDim2.new(0.5, -100, 0, 10)
@@ -63,10 +63,10 @@ Title.Font = Enum.Font.FredokaOne
 Title.TextXAlignment = Enum.TextXAlignment.Center
 Title.Parent = Frame
 
--- Title animation (pulsing + color shift)
+-- Title animation (smooth pulsing + color shift)
 local function animateTitle()
-    local sizeTween = TweenService:Create(Title, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, -1, true), {TextSize = 28})
-    local colorTween = TweenService:Create(Title, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(150, 255, 255)})
+    local sizeTween = TweenService:Create(Title, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextSize = 26})
+    local colorTween = TweenService:Create(Title, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(150, 255, 255)})
     sizeTween:Play()
     colorTween:Play()
 end
@@ -121,23 +121,21 @@ local CoinsUICorner = Instance.new("UICorner")
 CoinsUICorner.CornerRadius = UDim.new(0, 8)
 CoinsUICorner.Parent = CoinsButton
 
--- Creator Label with Enhanced Animation
+-- Creator Label with Subtle Glow Animation
 local Creator = Instance.new("TextLabel")
 Creator.Size = UDim2.new(0, 200, 0, 30)
 Creator.Position = UDim2.new(0.5, -100, 1, -40)
 Creator.BackgroundTransparency = 1
 Creator.Text = "Mo Iamchuasawad"
 Creator.TextColor3 = Color3.fromRGB(255, 255, 255)
-Creator.TextSize = 16
+Creator.TextSize = 20
 Creator.Font = Enum.Font.FredokaOne
 Creator.TextXAlignment = Enum.TextXAlignment.Center
 Creator.Parent = Frame
 
--- Creator animation (slide + glow)
+-- Creator animation (subtle glow pulse)
 local function animateCreator()
-    local posTween = TweenService:Create(Creator, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Position = UDim2.new(0.5, -90, 1, -40)})
-    local colorTween = TweenService:Create(Creator, TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(255, 200, 255)})
-    posTween:Play()
+    local colorTween = TweenService:Create(Creator, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(255, 200, 255)})
     colorTween:Play()
 end
 animateCreator()
@@ -145,10 +143,10 @@ animateCreator()
 -- Button Hover Effects
 local function applyHoverEffect(button)
     button.MouseEnter:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}):Play()
+        TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}):Play()
     end)
     button.MouseLeave:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
+        TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
     end)
 end
 
