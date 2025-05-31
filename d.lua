@@ -351,20 +351,29 @@ end
 -- Fetch Total Executions from logs table
 local function getTotalExecutions()
     local key = getgenv().key or ""
-    local requestUrl = SUPABASE_URL .. "/logs?key=eq." .. key
+    local requestUrl = SUPABASE_URL .. "/logs?key=eq." .. key .. "&select=count"
     local response = HttpRequestFunc({
         Url = requestUrl,
         Method = "GET",
         Headers = {
             ["Content-Type"] = "application/json",
             ["Authorization"] = "Bearer " .. SUPABASE_ANON_KEY,
-            ["apikey"] = SUPABASE_ANON_KEY
+            ["apikey"] = SUPABASE_ANON_KEY,
+            ["Prefer"] = "count=exact"
         }
     })
     if response and response.Body and response.StatusCode == 200 then
         local data = HttpService:JSONDecode(response.Body)
-        return #data
+        if data and type(data) == "table" then
+            local countHeader = response.Headers["content-range"]
+            if countHeader then
+                local count = tonumber(countHeader:match("/(%d+)")) or #data
+                return count
+            end
+            return #data
+        end
     end
+    print("❌ Failed to fetch logs: Status " .. (response and response.StatusCode or "No response"))
     return 0
 end
 
@@ -517,8 +526,8 @@ animateCreator()
 
 -- Note Frame
 local NoteFrame = Instance.new("Frame")
-NoteFrame.Size = UDim2.new(0, 330, 0, 30)
-NoteFrame.Position = UDim2.new(0.5, -165, 1, -35)
+NoteFrame.Size = UDim2.new(0, 300, 0, 20)
+NoteFrame.Position = UDim2.new(0.5, -150, 1, -25)
 NoteFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 NoteFrame.BorderSizePixel = 0
 NoteFrame.Parent = Frame
@@ -531,23 +540,23 @@ NoteUICorner.Parent = NoteFrame
 local exploit, scriptStatus = getKeyData()
 local totalExecutions = getTotalExecutions()
 local statusText = scriptStatus == "w" and "Working" or "Patched"
-local statusColor = scriptStatus == "w" and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+local statusColor = scriptStatus == "w" and Color3.fromRGB(150, 255, 150) or Color3.fromRGB(255, 150, 150) -- Pastel neon green/red
 
 local NoteText = Instance.new("TextLabel")
-NoteText.Size = UDim2.new(1, -10, 1, 0)
+NoteText.Size = UDim2.new(1, -30, 1, 0)
 NoteText.Position = UDim2.new(0, 5, 0, 0)
 NoteText.BackgroundTransparency = 1
-NoteText.Text = "Exploit: " .. exploit .. " / Total Executions: " .. totalExecutions .. " / Status: " .. statusText .. " ●"
+NoteText.Text = "Exploit: " .. exploit .. " / Total Executions: " .. totalExecutions .. " / Status: " .. statusText
 NoteText.TextColor3 = Color3.fromRGB(200, 200, 200)
-NoteText.TextSize = 12
+NoteText.TextSize = 10
 NoteText.Font = Enum.Font.SourceSans
 NoteText.TextXAlignment = Enum.TextXAlignment.Left
 NoteText.Parent = NoteFrame
 
--- Status Dot
+-- Status Dot with Neon Animation
 local StatusDot = Instance.new("Frame")
-StatusDot.Size = UDim2.new(0, 8, 0, 8)
-StatusDot.Position = UDim2.new(1, -13, 0.5, -4)
+StatusDot.Size = UDim2.new(0, 10, 0, 10)
+StatusDot.Position = UDim2.new(1, -15, 0.5, -5)
 StatusDot.BackgroundColor3 = statusColor
 StatusDot.BorderSizePixel = 0
 StatusDot.Parent = NoteFrame
@@ -555,6 +564,15 @@ StatusDot.Parent = NoteFrame
 local DotUICorner = Instance.new("UICorner")
 DotUICorner.CornerRadius = UDim.new(1, 0)
 DotUICorner.Parent = StatusDot
+
+-- Neon Glow Animation for Status Dot
+local function animateStatusDot()
+    local glowTween = TweenService:Create(StatusDot, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
+        BackgroundColor3 = scriptStatus == "w" and Color3.fromRGB(200, 255, 200) or Color3.fromRGB(255, 200, 200)
+    })
+    glowTween:Play()
+end
+animateStatusDot()
 
 -- Disable buttons if Patched
 if scriptStatus == "p" then
