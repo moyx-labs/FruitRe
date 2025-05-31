@@ -331,277 +331,254 @@ local function performWhitelistCheck()
     if not checkUserLock() then return false end
     if not checkSupportedMap(allowedPlaceIds, supportedMaps) then return false end
     print("✅ Whitelist!")
-    return true
-end
-
--- Perform authentication check
-if not performWhitelistCheck() then return end
-
--- Fetch Exploit, Script Status, Days, and Functionss from keys table
-local function getKeyData()
-    local key = getgenv().key or ""
-    local requestUrl = SUPABASE_URL .. "/keys?key=eq." .. key
-    local response = HttpRequestFunc({
-        Url = requestUrl,
-        Method = "GET",
-        Headers = {
-            ["Content-Type"] = "application/json",
-            ["Authorization"] = "Bearer " .. SUPABASE_ANON_KEY,
-            ["apikey"] = SUPABASE_ANON_KEY
-        }
-    })
-    if not response or not response.Body then 
-        print("❌ Failed to Fetch: Data (Status: " .. (response and response.StatusCode or "No response") .. ")")
-        return "Unknown", "w", 999999, {}
-    end
-    if response.StatusCode == 500 then
-        print("❌ Failed to Fetch Key: Internal Server Error")
-        return "Unknown", "w", 999999, {}
-    elseif response.StatusCode == 401 then
-        print("❌ Failed to Fetch Key: Unauthorized - Response:", response)
-        return "Unknown", "w", 999999, {}
-    end
-
-    local data = HttpService:JSONDecode(response.Body)
-    if not data or type(data) ~= "table" or #data == 0 then 
-        print("❌ Key Not Found!")
-        return "Unknown", "w", 999999, {} 
-    end
-
-    return data[1].exploit or "Unknown", data[1].script or "w", data[1].days or 999999, data[1].functionss or {}
-end
-
--- Create GUI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = playerGui
-ScreenGui.Name = "AnimeFruitGUI"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.IgnoreGuiInset = true
-
--- Main Frame (Horizontal, Extended Height)
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 350, 0, 180)
-Frame.Position = UDim2.new(0.5, -175, 0.5, -90)
-Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-Frame.BorderSizePixel = 0
-Frame.Parent = ScreenGui
-Frame.ClipsDescendants = true
-Frame.Visible = true
-
--- Apply corner radius
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 10)
-UICorner.Parent = Frame
-
--- Draggable functionality
-local dragging = false
-local dragStart = nil
-local startPos = nil
-
-Frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = Frame.Position
-    end
-end)
-
-Frame.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
-end)
-
--- Title Label with Smooth Animation (Size Only)
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(0, 200, 0, 40)
-Title.Position = UDim2.new(0, 15, 0, 5)
-Title.BackgroundTransparency = 1
-Title.Text = "AnimeFruit"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 24
-Title.Font = Enum.Font.FredokaOne
-Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.Parent = Frame
-
--- Title animation (smooth pulsing size only)
-local function animateTitle()
-    local sizeTween = TweenService:Create(Title, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextSize = 26})
-    sizeTween:Play()
-end
-animateTitle()
-
--- Close Button
-local CloseButton = Instance.new("TextButton")
-CloseButton.Size = UDim2.new(0, 30, 0, 30)
-CloseButton.Position = UDim2.new(1, -40, 0, 5)
-CloseButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-CloseButton.Text = "X"
-CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextSize = 18
-CloseButton.Font = Enum.Font.SourceSansBold
-CloseButton.Parent = Frame
-
-local CloseUICorner = Instance.new("UICorner")
-CloseUICorner.CornerRadius = UDim.new(0, 5)
-CloseUICorner.Parent = CloseButton
-
-CloseButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
-
--- Gem Button
-local GemButton = Instance.new("TextButton")
-GemButton.Size = UDim2.new(0, 100, 0, 40)
-GemButton.Position = UDim2.new(0.5, -110, 0.5, -5)
-GemButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-GemButton.Text = "Gem"
-GemButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-GemButton.TextSize = 18
-GemButton.Font = Enum.Font.SourceSansBold
-GemButton.Parent = Frame
-
-local GemUICorner = Instance.new("UICorner")
-GemUICorner.CornerRadius = UDim.new(0, 8)
-GemUICorner.Parent = GemButton
-
--- Coins Button
-local CoinsButton = Instance.new("TextButton")
-CoinsButton.Size = UDim2.new(0, 100, 0, 40)
-CoinsButton.Position = UDim2.new(0.5, 10, 0.5, -5)
-CoinsButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-CoinsButton.Text = "Coins"
-CoinsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CoinsButton.TextSize = 18
-CoinsButton.Font = Enum.Font.SourceSansBold
-CoinsButton.Parent = Frame
-
-local CoinsUICorner = Instance.new("UICorner")
-CoinsUICorner.CornerRadius = UDim.new(0, 8)
-CoinsUICorner.Parent = CoinsButton
-
--- "By" Text
-local ByText = Instance.new("TextLabel")
-ByText.Size = UDim2.new(0, 30, 0, 20)
-ByText.Position = UDim2.new(0, 15, 0, 40)
-ByText.BackgroundTransparency = 1
-ByText.Text = "By"
-ByText.TextColor3 = Color3.fromRGB(150, 150, 150)
-ByText.TextSize = 14
-ByText.Font = Enum.Font.FredokaOne
-ByText.TextXAlignment = Enum.TextXAlignment.Left
-ByText.Parent = Frame
-
--- "Mo Iamchuasawad" Text with Soft Pink Animation
-local NameText = Instance.new("TextLabel")
-NameText.Size = UDim2.new(0, 150, 0, 20)
-NameText.Position = UDim2.new(0, 45, 0, 40)
-NameText.BackgroundTransparency = 1
-NameText.Text = "Mo Iamchuasawad"
-NameText.TextColor3 = Color3.fromRGB(200, 200, 200)
-NameText.TextSize = 20
-NameText.Font = Enum.Font.FredokaOne
-NameText.TextXAlignment = Enum.TextXAlignment.Left
-NameText.Parent = Frame
-
--- Creator animation (soft pink glow for NameText only)
-local function animateCreator()
-    local colorTweenName = TweenService:Create(NameText, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(255, 220, 220)})
-    colorTweenName:Play()
-end
-animateCreator()
-
--- Note Frame
-local NoteFrame = Instance.new("Frame")
-NoteFrame.Size = UDim2.new(0, 300, 0, 20)
-NoteFrame.Position = UDim2.new(0.5, -150, 1, -30)
-NoteFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-NoteFrame.BorderSizePixel = 0
-NoteFrame.Parent = Frame
-
-local NoteUICorner = Instance.new("UICorner")
-NoteUICorner.CornerRadius = UDim.new(0, 5)
-NoteUICorner.Parent = NoteFrame
-
--- Note Text
-local exploit, scriptStatus, days, functionss = getKeyData()
-print("Functionss retrieved:", functionss) -- Debug print to inspect the value
-local expiryText = days == 999999 and "LifeTime" or tostring(days) .. " Day"
-local statusText = scriptStatus == "w" and "Working" or "Patched"
-local statusColor = scriptStatus == "w" and Color3.fromRGB(150, 255, 150) or Color3.fromRGB(255, 150, 150) -- Pastel neon green/red
-
-local NoteText = Instance.new("TextLabel")
-NoteText.Size = UDim2.new(1, -30, 1, 0)
-NoteText.Position = UDim2.new(0, 15, 0, 0)
-NoteText.BackgroundTransparency = 1
-NoteText.Text = "Exploit: " .. exploit .. " / Expired at: " .. expiryText .. " / Status: " .. statusText
-NoteText.TextColor3 = Color3.fromRGB(200, 200, 200)
-NoteText.TextSize = 10
-NoteText.Font = Enum.Font.SourceSans
-NoteText.TextXAlignment = Enum.TextXAlignment.Center
-NoteText.Parent = NoteFrame
-
--- Status Dot with Neon Animation
-local StatusDot = Instance.new("Frame")
-StatusDot.Size = UDim2.new(0, 10, 0, 10)
-StatusDot.Position = UDim2.new(1, -15, 0.5, -5)
-StatusDot.BackgroundColor3 = statusColor
-StatusDot.BorderSizePixel = 0
-StatusDot.Parent = NoteFrame
-
-local DotUICorner = Instance.new("UICorner")
-DotUICorner.CornerRadius = UDim.new(1, 0)
-DotUICorner.Parent = StatusDot
-
--- Neon Glow Animation for Status Dot
-local function animateStatusDot()
-    local glowTween = TweenService:Create(StatusDot, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
-        BackgroundColor3 = scriptStatus == "w" and Color3.fromRGB(200, 255, 200) or Color3.fromRGB(255, 200, 200)
-    })
-    glowTween:Play()
-end
-animateStatusDot()
-
--- Check available functions and enable/disable buttons
-local hasGem = findInTable(functionss, "gem")
-local hasCoins = findInTable(functionss, "coins")
-
--- Disable buttons if Patched or function not available
-if scriptStatus == "p" or (not hasGem and not hasCoins) then
-    GemButton.AutoButtonColor = false
-    GemButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    GemButton.TextColor3 = Color3.fromRGB(150, 150, 150)
-    CoinsButton.AutoButtonColor = false
-    CoinsButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    CoinsButton.TextColor3 = Color3.fromRGB(150, 150, 150)
-else
-    -- Enable Gem button if gem function is available
-    if not hasGem then
-        GemButton.AutoButtonColor = false
-        GemButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-        GemButton.TextColor3 = Color3.fromRGB(150, 150, 150)
+    
+    -- Start loading data
+    print("⏳ Loading key data...")
+    
+    -- Fetch key data (exploit, script status, days, and functionss)
+    local exploit, scriptStatus, days, functionss = getKeyData()
+    if not exploit then
+        print("❌ Failed to load data!")
+        return false
     end
     
-    -- Enable Coins button if coins function is available
-    if not hasCoins then
-        CoinsButton.AutoButtonColor = false
-        CoinsButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-        CoinsButton.TextColor3 = Color3.fromRGB(150, 150, 150)
-    end
-end
+    -- Determine button states before creating the GUI
+    local hasGem = findInTable(functionss, "gem")
+    local hasCoins = findInTable(functionss, "coins")
+    
+    -- Determine if buttons should be enabled
+    local gemEnabled = scriptStatus == "w" and hasGem
+    local coinsEnabled = scriptStatus == "w" and hasCoins
+    
+    -- Determine disable reasons for each button
+    local gemDisableReason = scriptStatus == "p" and "( Patched )" or not hasGem and "( No Access )" or ""
+    local coinsDisableReason = scriptStatus == "p" and "( Patched )" or not hasCoins and "( No Access )" or ""
+    
+    -- Create GUI after all data is loaded
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Parent = playerGui
+    ScreenGui.Name = "AnimeFruitGUI"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.IgnoreGuiInset = true
 
--- Button Hover Effects
-local function applyHoverEffect(button)
-    if scriptStatus == "p" then return end
-    -- Only apply hover effect if button is enabled
-    if (button == GemButton and hasGem) or (button == CoinsButton and hasCoins) or button == CloseButton then
+    -- Main Frame (Horizontal, Extended Height)
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0, 350, 0, 200) -- Increased height to accommodate reason labels
+    Frame.Position = UDim2.new(0.5, -175, 0.5, -100)
+    Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Frame.BorderSizePixel = 0
+    Frame.Parent = ScreenGui
+    Frame.ClipsDescendants = true
+    Frame.Visible = true
+
+    -- Apply corner radius
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 10)
+    UICorner.Parent = Frame
+
+    -- Draggable functionality
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+
+    Frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = Frame.Position
+        end
+    end)
+
+    Frame.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+
+    -- Title Label with Smooth Animation (Size Only)
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(0, 200, 0, 40)
+    Title.Position = UDim2.new(0, 15, 0, 5)
+    Title.BackgroundTransparency = 1
+    Title.Text = "AnimeFruit"
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextSize = 24
+    Title.Font = Enum.Font.FredokaOne
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = Frame
+
+    -- Title animation (smooth pulsing size only)
+    local function animateTitle()
+        local sizeTween = TweenService:Create(Title, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextSize = 26})
+        sizeTween:Play()
+    end
+    animateTitle()
+
+    -- Close Button
+    local CloseButton = Instance.new("TextButton")
+    CloseButton.Size = UDim2.new(0, 30, 0, 30)
+    CloseButton.Position = UDim2.new(1, -40, 0, 5)
+    CloseButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    CloseButton.Text = "X"
+    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CloseButton.TextSize = 18
+    CloseButton.Font = Enum.Font.SourceSansBold
+    CloseButton.Parent = Frame
+
+    local CloseUICorner = Instance.new("UICorner")
+    CloseUICorner.CornerRadius = UDim.new(0, 5)
+    CloseUICorner.Parent = CloseButton
+
+    CloseButton.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+
+    -- Gem Button
+    local GemButton = Instance.new("TextButton")
+    GemButton.Size = UDim2.new(0, 100, 0, 40)
+    GemButton.Position = UDim2.new(0.5, -110, 0.5, -10)
+    GemButton.BackgroundColor3 = gemEnabled and Color3.fromRGB(60, 60, 60) or Color3.fromRGB(255, 245, 145) -- Pastel yellow for disabled
+    GemButton.Text = "Gem"
+    GemButton.TextColor3 = gemEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
+    GemButton.TextSize = 18
+    GemButton.Font = Enum.Font.SourceSansBold
+    GemButton.AutoButtonColor = gemEnabled
+    GemButton.Parent = Frame
+
+    local GemUICorner = Instance.new("UICorner")
+    GemUICorner.CornerRadius = UDim.new(0, 8)
+    GemUICorner.Parent = GemButton
+
+    -- Gem Disable Reason Label
+    local GemReasonLabel = Instance.new("TextLabel")
+    GemReasonLabel.Size = UDim2.new(0, 100, 0, 15)
+    GemReasonLabel.Position = UDim2.new(0.5, -110, 0.5, 30)
+    GemReasonLabel.BackgroundTransparency = 1
+    GemReasonLabel.Text = gemDisableReason
+    GemReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    GemReasonLabel.TextSize = 10
+    GemReasonLabel.Font = Enum.Font.SourceSans
+    GemReasonLabel.TextXAlignment = Enum.TextXAlignment.Center
+    GemReasonLabel.Parent = Frame
+
+    -- Coins Button
+    local CoinsButton = Instance.new("TextButton")
+    CoinsButton.Size = UDim2.new(0, 100, 0, 40)
+    CoinsButton.Position = UDim2.new(0.5, 10, 0.5, -10)
+    CoinsButton.BackgroundColor3 = coinsEnabled and Color3.fromRGB(60, 60, 60) or Color3.fromRGB(255, 245, 145) -- Pastel yellow for disabled
+    CoinsButton.Text = "Coins"
+    CoinsButton.TextColor3 = coinsEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
+    CoinsButton.TextSize = 18
+    CoinsButton.Font = Enum.Font.SourceSansBold
+    CoinsButton.AutoButtonColor = coinsEnabled
+    CoinsButton.Parent = Frame
+
+    local CoinsUICorner = Instance.new("UICorner")
+    CoinsUICorner.CornerRadius = UDim.new(0, 8)
+    CoinsUICorner.Parent = CoinsButton
+
+    -- Coins Disable Reason Label
+    local CoinsReasonLabel = Instance.new("TextLabel")
+    CoinsReasonLabel.Size = UDim2.new(0, 100, 0, 15)
+    CoinsReasonLabel.Position = UDim2.new(0.5, 10, 0.5, 30)
+    CoinsReasonLabel.BackgroundTransparency = 1
+    CoinsReasonLabel.Text = coinsDisableReason
+    CoinsReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    CoinsReasonLabel.TextSize = 10
+    CoinsReasonLabel.Font = Enum.Font.SourceSans
+    CoinsReasonLabel.TextXAlignment = Enum.TextXAlignment.Center
+    CoinsReasonLabel.Parent = Frame
+
+    -- "By" Text
+    local ByText = Instance.new("TextLabel")
+    ByText.Size = UDim2.new(0, 30, 0, 20)
+    ByText.Position = UDim2.new(0, 15, 0, 40)
+    ByText.BackgroundTransparency = 1
+    ByText.Text = "By"
+    ByText.TextColor3 = Color3.fromRGB(150, 150, 150)
+    ByText.TextSize = 14
+    ByText.Font = Enum.Font.FredokaOne
+    ByText.TextXAlignment = Enum.TextXAlignment.Left
+    ByText.Parent = Frame
+
+    -- "Mo Iamchuasawad" Text with Soft Pink Animation
+    local NameText = Instance.new("TextLabel")
+    NameText.Size = UDim2.new(0, 150, 0, 20)
+    NameText.Position = UDim2.new(0, 45, 0, 40)
+    NameText.BackgroundTransparency = 1
+    NameText.Text = "Mo Iamchuasawad"
+    NameText.TextColor3 = Color3.fromRGB(200, 200, 200)
+    NameText.TextSize = 20
+    NameText.Font = Enum.Font.FredokaOne
+    NameText.TextXAlignment = Enum.TextXAlignment.Left
+    NameText.Parent = Frame
+
+    -- Creator animation (soft pink glow for NameText only)
+    local function animateCreator()
+        local colorTweenName = TweenService:Create(NameText, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(255, 220, 220)})
+        colorTweenName:Play()
+    end
+    animateCreator()
+
+    -- Note Frame
+    local NoteFrame = Instance.new("Frame")
+    NoteFrame.Size = UDim2.new(0, 300, 0, 20)
+    NoteFrame.Position = UDim2.new(0.5, -150, 1, -30)
+    NoteFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    NoteFrame.BorderSizePixel = 0
+    NoteFrame.Parent = Frame
+
+    local NoteUICorner = Instance.new("UICorner")
+    NoteUICorner.CornerRadius = UDim.new(0, 5)
+    NoteUICorner.Parent = NoteFrame
+
+    -- Note Text
+    local expiryText = days == 999999 and "LifeTime" or tostring(days) .. " Day"
+    local statusText = scriptStatus == "w" and "Working" or "Patched"
+    local statusColor = scriptStatus == "w" and Color3.fromRGB(150, 255, 150) or Color3.fromRGB(255, 150, 150) -- Pastel neon green/red
+
+    local NoteText = Instance.new("TextLabel")
+    NoteText.Size = UDim2.new(1, -30, 1, 0)
+    NoteText.Position = UDim2.new(0, 15, 0, 0)
+    NoteText.BackgroundTransparency = 1
+    NoteText.Text = "Exploit: " .. exploit .. " / Expired at: " .. expiryText .. " / Status: " .. statusText
+    NoteText.TextColor3 = Color3.fromRGB(200, 200, 200)
+    NoteText.TextSize = 10
+    NoteText.Font = Enum.Font.SourceSans
+    NoteText.TextXAlignment = Enum.TextXAlignment.Center
+    NoteText.Parent = NoteFrame
+
+    -- Status Dot with Neon Animation
+    local StatusDot = Instance.new("Frame")
+    StatusDot.Size = UDim2.new(0, 10, 0, 10)
+    StatusDot.Position = UDim2.new(1, -15, 0.5, -5)
+    StatusDot.BackgroundColor3 = statusColor
+    StatusDot.BorderSizePixel = 0
+    StatusDot.Parent = NoteFrame
+
+    local DotUICorner = Instance.new("UICorner")
+    DotUICorner.CornerRadius = UDim.new(1, 0)
+    DotUICorner.Parent = StatusDot
+
+    -- Neon Glow Animation for Status Dot
+    local function animateStatusDot()
+        local glowTween = TweenService:Create(StatusDot, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
+            BackgroundColor3 = scriptStatus == "w" and Color3.fromRGB(200, 255, 200) or Color3.fromRGB(255, 200, 200)
+        })
+        glowTween:Play()
+    end
+    animateStatusDot()
+
+    -- Button Hover Effects
+    local function applyHoverEffect(button)
+        if (button == GemButton and not gemEnabled) or (button == CoinsButton and not coinsEnabled) then return end
         button.MouseEnter:Connect(function()
             TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}):Play()
         end)
@@ -609,52 +586,57 @@ local function applyHoverEffect(button)
             TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
         end)
     end
+
+    applyHoverEffect(GemButton)
+    applyHoverEffect(CoinsButton)
+    applyHoverEffect(CloseButton)
+
+    -- Gem Script
+    GemButton.MouseButton1Click:Connect(function()
+        if not gemEnabled then return end
+        local Event = game:GetService("ReplicatedStorage").Assets.Okay
+        Event:FireServer(table.unpack({
+            (function(bytes)
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ 71 }),
+            (function(bytes)
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ 254, 2, 0, 6, 1, 50, 2, 25, 252 })
+        }))
+    end)
+
+    -- Coins Script
+    CoinsButton.MouseButton1Click:Connect(function()
+        if not coinsEnabled then return end
+        local Event = game:GetService("ReplicatedStorage").Assets.Okay
+        Event:FireServer(table.unpack({
+            (function(bytes)
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ 71 }),
+            (function(bytes)
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ 254, 2, 0, 6, 1, 49, 3, 96, 121, 254, 255 })
+        }))
+    end)
+
+    return true
 end
 
-applyHoverEffect(GemButton)
-applyHoverEffect(CoinsButton)
-applyHoverEffect(CloseButton)
-
--- Gem Script
-GemButton.MouseButton1Click:Connect(function()
-    if scriptStatus == "p" or not hasGem then return end
-    local Event = game:GetService("ReplicatedStorage").Assets.Okay
-    Event:FireServer(table.unpack({
-        (function(bytes)
-            local b = buffer.create(#bytes)
-            for i = 1, #bytes do
-                buffer.writeu8(b, i - 1, bytes[i])
-            end
-            return b
-        end)({ 71 }),
-        (function(bytes)
-            local b = buffer.create(#bytes)
-            for i = 1, #bytes do
-                buffer.writeu8(b, i - 1, bytes[i])
-            end
-            return b
-        end)({ 254, 2, 0, 6, 1, 50, 2, 25, 252 })
-    }))
-end)
-
--- Coins Script
-CoinsButton.MouseButton1Click:Connect(function()
-    if scriptStatus == "p" or not hasCoins then return end
-    local Event = game:GetService("ReplicatedStorage").Assets.Okay
-    Event:FireServer(table.unpack({
-        (function(bytes)
-            local b = buffer.create(#bytes)
-            for i = 1, #bytes do
-                buffer.writeu8(b, i - 1, bytes[i])
-            end
-            return b
-        end)({ 71 }),
-        (function(bytes)
-            local b = buffer.create(#bytes)
-            for i = 1, #bytes do
-                buffer.writeu8(b, i - 1, bytes[i])
-            end
-            return b
-        end)({ 254, 2, 0, 6, 1, 49, 3, 96, 121, 254, 255 })
-    }))
-end)
+-- Perform authentication check
+if not performWhitelistCheck() then return end
