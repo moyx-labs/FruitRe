@@ -51,7 +51,7 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
--- Title Label with Smooth Animation
+-- Title Label with Smooth Animation (Size Only)
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(0, 200, 0, 40)
 Title.Position = UDim2.new(0, 15, 0, 10)
@@ -63,12 +63,10 @@ Title.Font = Enum.Font.FredokaOne
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Frame
 
--- Title animation (smooth pulsing + color shift)
+-- Title animation (smooth pulsing size only)
 local function animateTitle()
     local sizeTween = TweenService:Create(Title, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextSize = 26})
-    local colorTween = TweenService:Create(Title, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(150, 255, 255)})
     sizeTween:Play()
-    colorTween:Play()
 end
 animateTitle()
 
@@ -94,7 +92,7 @@ end)
 -- Gem Button
 local GemButton = Instance.new("TextButton")
 GemButton.Size = UDim2.new(0, 100, 0, 40)
-GemButton.Position = UDim2.new(0.5, -110, 0.5, -20)
+GemButton.Position = UDim2.new(0.5, -110, 0.5, 10)
 GemButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 GemButton.Text = "Gem 99k"
 GemButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -109,7 +107,7 @@ GemUICorner.Parent = GemButton
 -- Coins Button
 local CoinsButton = Instance.new("TextButton")
 CoinsButton.Size = UDim2.new(0, 100, 0, 40)
-CoinsButton.Position = UDim2.new(0.5, 10, 0.5, -20)
+CoinsButton.Position = UDim2.new(0.5, 10, 0.5, 10)
 CoinsButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 CoinsButton.Text = "Coins 100M"
 CoinsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -121,34 +119,22 @@ local CoinsUICorner = Instance.new("UICorner")
 CoinsUICorner.CornerRadius = UDim.new(0, 8)
 CoinsUICorner.Parent = CoinsButton
 
--- Creator Label with Subtle Glow Animation
-local Creator = Instance.new("TextLabel")
-Creator.Size = UDim2.new(0, 200, 0, 30)
-Creator.Position = UDim2.new(0.5, -100, 1, -40)
-Creator.BackgroundTransparency = 1
-Creator.Text = ""
-Creator.TextColor3 = Color3.fromRGB(200, 200, 200)
-Creator.TextSize = 20
-Creator.Font = Enum.Font.FredokaOne
-Creator.TextXAlignment = Enum.TextXAlignment.Center
-Creator.Parent = Frame
-
 -- "By" Text
 local ByText = Instance.new("TextLabel")
 ByText.Size = UDim2.new(0, 30, 0, 20)
-ByText.Position = UDim2.new(0.5, -60, 1, -40)
+ByText.Position = UDim2.new(0, 15, 0, 45)
 ByText.BackgroundTransparency = 1
 ByText.Text = "By"
 ByText.TextColor3 = Color3.fromRGB(150, 150, 150)
 ByText.TextSize = 14
 ByText.Font = Enum.Font.FredokaOne
-ByText.TextXAlignment = Enum.TextXAlignment.Right
+ByText.TextXAlignment = Enum.TextXAlignment.Left
 ByText.Parent = Frame
 
--- "Mo Iamchuasawad" Text
+-- "Mo Iamchuasawad" Text with Soft Pink Animation
 local NameText = Instance.new("TextLabel")
 NameText.Size = UDim2.new(0, 150, 0, 20)
-NameText.Position = UDim2.new(0.5, -25, 1, -40)
+NameText.Position = UDim2.new(0, 45, 0, 45)
 NameText.BackgroundTransparency = 1
 NameText.Text = "Mo Iamchuasawad"
 NameText.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -157,11 +143,9 @@ NameText.Font = Enum.Font.FredokaOne
 NameText.TextXAlignment = Enum.TextXAlignment.Left
 NameText.Parent = Frame
 
--- Creator animation (subtle glow pulse for both By and Name)
+-- Creator animation (soft pink glow for NameText only)
 local function animateCreator()
-    local colorTweenBy = TweenService:Create(ByText, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(180, 180, 180)})
-    local colorTweenName = TweenService:Create(NameText, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(220, 220, 220)})
-    colorTweenBy:Play()
+    local colorTweenName = TweenService:Create(NameText, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(255, 220, 220)})
     colorTweenName:Play()
 end
 animateCreator()
