@@ -507,8 +507,20 @@ local NoteUICorner = Instance.new("UICorner")
 NoteUICorner.CornerRadius = UDim.new(0, 5)
 NoteUICorner.Parent = NoteFrame
 
+-- Custom function to replace table.find for compatibility
+local function findInTable(tbl, value)
+    if type(tbl) ~= "table" then return false end
+    for _, v in ipairs(tbl) do
+        if v == value then
+            return true
+        end
+    end
+    return false
+end
+
 -- Note Text
 local exploit, scriptStatus, days, functions = getKeyData()
+print("Functions retrieved:", functions) -- Debug print to inspect the value
 local expiryText = days == 999999 and "LifeTime" or tostring(days) .. " Day"
 local statusText = scriptStatus == "w" and "Working" or "Patched"
 local statusColor = scriptStatus == "w" and Color3.fromRGB(150, 255, 150) or Color3.fromRGB(255, 150, 150) -- Pastel neon green/red
@@ -546,8 +558,8 @@ end
 animateStatusDot()
 
 -- Check available functions and enable/disable buttons
-local hasGem = table.find(functions, "gem")
-local hasCoins = table.find(functions, "coins")
+local hasGem = findInTable(functions, "gem")
+local hasCoins = findInTable(functions, "coins")
 
 -- Disable buttons if Patched or function not available
 if scriptStatus == "p" or (not hasGem and not hasCoins) then
