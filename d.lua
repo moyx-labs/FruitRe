@@ -7,7 +7,18 @@ local TweenService = game:GetService("TweenService")
 
 -- Supabase Configuration
 local SUPABASE_URL = "https://eusxbcbwyhjtfjplwtst.supabase.co/rest/v1"
-local SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1c3hiY2J3eWhqdGZqcGx3dHN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQzNTEzOTksImV4cCI6MjA1OTkyNzM9OX0.d6DTqwlZ4X69orabNA0tzxrucsnVv531dqzUcsxum6E"
+local SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1c3hiY2J3eWhqdGZqcGx3dHN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQzNTEzOTksImV4cCI6MjA1OTkyNzM5OX0.d6DTqwlZ4X69orabNA0tzxrucsnVv531dqzUcsxum6E"
+
+-- Custom function to replace table.find for compatibility
+local function findInTable(tbl, value)
+    if type(tbl) ~= "table" then return false end
+    for _, v in ipairs(tbl) do
+        if v == value then
+            return true
+        end
+    end
+    return false
+end
 
 -- Wait for game to load
 repeat task.wait() until game:IsLoaded() and game.Players and game.Players.LocalPlayer and game.Players.LocalPlayer.Character
@@ -101,7 +112,7 @@ end
 local function getFingerprint(allowexec)
     if hasGetHwid then 
         return gethwid() 
-    elseif allowexec and type(allowexec) == "table" and table.find(allowexec, executorName) then
+    elseif allowexec and type(allowexec) == "table" and findInTable(allowexec, executorName) then
         return game:GetService("RbxAnalyticsService"):GetClientId() or "NO_HWID_" .. executorName
     else
         print("❌ No Support: " .. executorName)
@@ -135,7 +146,7 @@ local function updateHwid(key, hwid, exploit)
         print("❌ Failed to Activate Key: Internal Server Error")
         return false
     elseif response.StatusCode == 401 then
-        print("❌ Failed to Activate Key: Unauthorized")
+        print("❌ Failed to Activate Key: Unauthorized - Response:", response)
         return false
     elseif response.StatusCode == 403 then
         print("❌ Failed to Activate Key: Forbidden")
@@ -174,7 +185,7 @@ local function logUsage(key, hwid, exploit, userId)
         print("❌ Failed to Log Usage: Internal Server Error")
         return false
     elseif response.StatusCode == 401 then
-        print("❌ Failed to Log Usage: Unauthorized")
+        print("❌ Failed to Log Usage: Unauthorized - Response:", response)
         return false
     elseif response.StatusCode == 201 then
         return true
@@ -210,7 +221,7 @@ local function checkKey()
         print("❌ Failed to Fetch Key: Internal Server Error")
         return false, nil, nil
     elseif response.StatusCode == 401 then
-        print("❌ Failed to Fetch Key: Unauthorized")
+        print("❌ Failed to Fetch Key: Unauthorized - Response:", response)
         return false, nil, nil
     end
 
@@ -286,7 +297,7 @@ local function checkUserLock()
         print("❌ Failed to Fetch Locked Users: Internal Server Error")
         return false
     elseif response.StatusCode == 401 then
-        print("❌ Failed to Fetch Locked Users: Unauthorized")
+        print("❌ Failed to Fetch Locked Users: Unauthorized - Response:", response)
         return false
     end
 
@@ -305,7 +316,7 @@ local function checkSupportedMap(allowedPlaceIds, supportedMaps)
         print("❌ Unsupported PlaceId: " .. game.PlaceId .. " (Key Supports: " .. mapNames .. ")")
         return false
     end
-    if not table.find(allowedPlaceIds, game.PlaceId) then
+    if not findInTable(allowedPlaceIds, game.PlaceId) then
         local mapNames = #supportedMaps > 0 and table.concat(supportedMaps, " / ") or "None"
         print("❌ Unsupported PlaceId: " .. game.PlaceId .. " (Key Supports: " .. mapNames .. ")")
         return false
@@ -339,13 +350,25 @@ local function getKeyData()
             ["apikey"] = SUPABASE_ANON_KEY
         }
     })
-    if response and response.Body and response.StatusCode == 200 then
-        local data = HttpService:JSONDecode(response.Body)
-        if data and data[1] then
-            return data[1].exploit or "Unknown", data[1].script or "w", data[1].days or 999999, data[1].functionss or {}
-        end
+    if not response or not response.Body then 
+        print("❌ Failed to Fetch: Data (Status: " .. (response and response.StatusCode or "No response") .. ")")
+        return "Unknown", "w", 999999, {}
     end
-    return "Unknown", "w", 999999, {}
+    if response.StatusCode == 500 then
+        print("❌ Failed to Fetch Key: Internal Server Error")
+        return "Unknown", "w", 999999, {}
+    elseif response.StatusCode == 401 then
+        print("❌ Failed to Fetch Key: Unauthorized - Response:", response)
+        return "Unknown", "w", 999999, {}
+    end
+
+    local data = HttpService:JSONDecode(response.Body)
+    if not data or type(data) ~= "table" or #data == 0 then 
+        print("❌ Key Not Found!")
+        return "Unknown", "w", 999999, {} 
+    end
+
+    return data[1].exploit or "Unknown", data[1].script or "w", data[1].days or 999999, data[1].functionss or {}
 end
 
 -- Create GUI
@@ -506,17 +529,6 @@ NoteFrame.Parent = Frame
 local NoteUICorner = Instance.new("UICorner")
 NoteUICorner.CornerRadius = UDim.new(0, 5)
 NoteUICorner.Parent = NoteFrame
-
--- Custom function to replace table.find for compatibility
-local function findInTable(tbl, value)
-    if type(tbl) ~= "table" then return false end
-    for _, v in ipairs(tbl) do
-        if v == value then
-            return true
-        end
-    end
-    return false
-end
 
 -- Note Text
 local exploit, scriptStatus, days, functionss = getKeyData()
