@@ -7,7 +7,7 @@ local TweenService = game:GetService("TweenService")
 
 -- Supabase Configuration
 local SUPABASE_URL = "https://eusxbcbwyhjtfjplwtst.supabase.co/rest/v1"
-local SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1c3hiY2J3eWhqdGZqcGx3dHN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQzNTEzOTksImV4cCI6MjA1OTkyNzM5OX0.d6DTqwlZ4X69orabNA0tzxrucsnVv531dqzUcsxum6E"
+local SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1c3hiY2J3eWhqdGZqcGx3dHN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQzNTEzOTksImV4cCI6MjA1OTkyNzM9OX0.d6DTqwlZ4X69orabNA0tzxrucsnVv531dqzUcsxum6E"
 
 -- Wait for game to load
 repeat task.wait() until game:IsLoaded() and game.Players and game.Players.LocalPlayer and game.Players.LocalPlayer.Character
@@ -326,7 +326,7 @@ end
 -- Perform authentication check
 if not performWhitelistCheck() then return end
 
--- Fetch Exploit, Script Status, Days, and Function from keys table
+-- Fetch Exploit, Script Status, Days, and Functionss from keys table
 local function getKeyData()
     local key = getgenv().key or ""
     local requestUrl = SUPABASE_URL .. "/keys?key=eq." .. key
@@ -342,7 +342,7 @@ local function getKeyData()
     if response and response.Body and response.StatusCode == 200 then
         local data = HttpService:JSONDecode(response.Body)
         if data and data[1] then
-            return data[1].exploit or "Unknown", data[1].script or "w", data[1].days or 999999, data[1].function or {}
+            return data[1].exploit or "Unknown", data[1].script or "w", data[1].days or 999999, data[1].functionss or {}
         end
     end
     return "Unknown", "w", 999999, {}
@@ -519,8 +519,8 @@ local function findInTable(tbl, value)
 end
 
 -- Note Text
-local exploit, scriptStatus, days, functions = getKeyData()
-print("Functions retrieved:", functions) -- Debug print to inspect the value
+local exploit, scriptStatus, days, functionss = getKeyData()
+print("Functionss retrieved:", functionss) -- Debug print to inspect the value
 local expiryText = days == 999999 and "LifeTime" or tostring(days) .. " Day"
 local statusText = scriptStatus == "w" and "Working" or "Patched"
 local statusColor = scriptStatus == "w" and Color3.fromRGB(150, 255, 150) or Color3.fromRGB(255, 150, 150) -- Pastel neon green/red
@@ -558,8 +558,8 @@ end
 animateStatusDot()
 
 -- Check available functions and enable/disable buttons
-local hasGem = findInTable(functions, "gem")
-local hasCoins = findInTable(functions, "coins")
+local hasGem = findInTable(functionss, "gem")
+local hasCoins = findInTable(functionss, "coins")
 
 -- Disable buttons if Patched or function not available
 if scriptStatus == "p" or (not hasGem and not hasCoins) then
