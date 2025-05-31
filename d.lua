@@ -44,11 +44,11 @@ local secureHttp = {}
 local secureMt = {
     __call = function(_, req)
         if not checkHookTamper() then return nil end
-        if type(OriginalHttpFunc) ~= "function" or pcall(OriginalHttpFunc, {Url = "https://example.com", Method = "GET"}) == false then 
+        if type(OriginalHttpFunc) ~= "function" or not pcall(OriginalHttpFunc, {Url = "https://example.com", Method = "GET"}) then 
             print("❌ HTTP Function Corrupted!") 
             return nil 
         end
-        if req.Url and req.Method and string.match(req.Url, "^https://eusxbcbwyhjtfjplwtst%.supabase%.co/rest/v1/") then
+        if req.Url and req.Method and string.match(req.Url, "^https://eusxbcbwyhjtfjplwtst%.supabase%.co") then
             local response = OriginalHttpFunc(req)
             if response and response.StatusCode and (response.StatusCode < 200 or response.StatusCode >= 400) then 
                 print("❌ Invalid Response Status: " .. tostring(response.StatusCode)) 
@@ -64,7 +64,7 @@ local secureMt = {
     __newindex = function() print("❌ Attempt to Modify Secure HTTP!") return nil end
 }
 if hasGetHwid then 
-    setmetatable(secureHttp, secureMt) 
+    setmetatable(secureHttp, secureMt)
     HttpRequestFunc = secureHttp 
 end
 
@@ -314,19 +314,17 @@ local function checkSupportedMap(allowedPlaceIds, supportedMaps)
 end
 
 local function performWhitelistCheck()
-    if not checkTimeout() then return false end
+    if not checkTimeout() then return false, nil end
     local isValidKey, allowedPlaceIds, supportedMaps = checkKey()
-    if not isValidKey then return false end
-    if not checkUserLock() then return false end
-    if not checkSupportedMap(allowedPlaceIds, supportedMaps) then return false end
+    if not isValidKey then return false, nil end
+    if not checkUserLock() then return false, nil end
+    if not checkSupportedMap(allowedPlaceIds, supportedMaps) then return false, nil end
     print("✅ Whitelist!")
-    return true
+    local keyData = getKeyData()
+    return true, keyData.functions
 end
 
--- Perform authentication check
-if not performWhitelistCheck() then return end
-
--- Fetch Exploit, Script Status, and Days from keys table
+-- Fetch Exploit, Script Status, Days, and Functions from keys table
 local function getKeyData()
     local key = getgenv().key or ""
     local requestUrl = SUPABASE_URL .. "/keys?key=eq." .. key
@@ -342,11 +340,25 @@ local function getKeyData()
     if response and response.Body and response.StatusCode == 200 then
         local data = HttpService:JSONDecode(response.Body)
         if data and data[1] then
-            return data[1].exploit or "Unknown", data[1].script or "w", data[1].days or 999999
+            return {
+                exploit = data[1].exploit or "Unknown",
+                script = data[1].script or "w",
+                days = data[1].days or 999999,
+                functions = data[1].function or {}
+            }
         end
     end
-    return "Unknown", "w", 999999
+    return {
+        exploit = "Unknown",
+        script = "w",
+        days = 999999,
+        functions = {}
+    }
 end
+
+-- Perform authentication check and get functions
+local isWhitelisted, allowedFunctions = performWhitelistCheck()
+if not isWhitelisted then return end
 
 -- Create GUI
 local ScreenGui = Instance.new("ScreenGui")
@@ -439,7 +451,7 @@ local GemButton = Instance.new("TextButton")
 GemButton.Size = UDim2.new(0, 100, 0, 40)
 GemButton.Position = UDim2.new(0.5, -110, 0.5, -5)
 GemButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-GemButton.Text = "Gem"
+GemButton.Text = "Gem 99k"
 GemButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 GemButton.TextSize = 18
 GemButton.Font = Enum.Font.SourceSansBold
@@ -454,7 +466,7 @@ local CoinsButton = Instance.new("TextButton")
 CoinsButton.Size = UDim2.new(0, 100, 0, 40)
 CoinsButton.Position = UDim2.new(0.5, 10, 0.5, -5)
 CoinsButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-CoinsButton.Text = "Coins"
+CoinsButton.Text = "Coins 100M"
 CoinsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CoinsButton.TextSize = 18
 CoinsButton.Font = Enum.Font.SourceSansBold
@@ -508,7 +520,11 @@ NoteUICorner.CornerRadius = UDim.new(0, 5)
 NoteUICorner.Parent = NoteFrame
 
 -- Note Text
-local exploit, scriptStatus, days = getKeyData()
+local keyData = getKeyData()
+local exploit = keyData.exploit
+local scriptStatus = keyData.script
+local days = keyData.days
+local functions = keyData.functions
 local expiryText = days == 999999 and "LifeTime" or tostring(days) .. " Day"
 local statusText = scriptStatus == "w" and "Working" or "Patched"
 local statusColor = scriptStatus == "w" and Color3.fromRGB(150, 255, 150) or Color3.fromRGB(255, 150, 150) -- Pastel neon green/red
@@ -545,19 +561,26 @@ local function animateStatusDot()
 end
 animateStatusDot()
 
--- Disable buttons if Patched
-if scriptStatus == "p" then
+-- Check allowed functions and control button states
+local allowGem = table.find(functions, "gem")
+local allowCoins = table.find(functions, "coins")
+
+-- Disable buttons based on functions and script status
+if not allowGem or scriptStatus == "p" then
     GemButton.AutoButtonColor = false
     GemButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     GemButton.TextColor3 = Color3.fromRGB(150, 150, 150)
+end
+
+if not allowCoins or scriptStatus == "p" then
     CoinsButton.AutoButtonColor = false
     CoinsButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     CoinsButton.TextColor3 = Color3.fromRGB(150, 150, 150)
 end
 
 -- Button Hover Effects
-local function applyHoverEffect(button)
-    if scriptStatus == "p" then return end
+local function applyHoverEffect(button, isAllowed)
+    if scriptStatus == "p" or not isAllowed then return end
     button.MouseEnter:Connect(function()
         TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}):Play()
     end)
@@ -566,13 +589,13 @@ local function applyHoverEffect(button)
     end)
 end
 
-applyHoverEffect(GemButton)
-applyHoverEffect(CoinsButton)
-applyHoverEffect(CloseButton)
+applyHoverEffect(GemButton, allowGem)
+applyHoverEffect(CoinsButton, allowCoins)
+applyHoverEffect(CloseButton, true)
 
 -- Gem Script
 GemButton.MouseButton1Click:Connect(function()
-    if scriptStatus == "p" then return end
+    if not allowGem or scriptStatus == "p" then return end
     local Event = game:GetService("ReplicatedStorage").Assets.Okay
     Event:FireServer(table.unpack({
         (function(bytes)
@@ -594,7 +617,7 @@ end)
 
 -- Coins Script
 CoinsButton.MouseButton1Click:Connect(function()
-    if scriptStatus == "p" then return end
+    if not allowCoins or scriptStatus == "p" then return end
     local Event = game:GetService("ReplicatedStorage").Assets.Okay
     Event:FireServer(table.unpack({
         (function(bytes)
