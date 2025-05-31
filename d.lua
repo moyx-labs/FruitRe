@@ -351,7 +351,7 @@ end
 -- Fetch Total Executions from logs table
 local function getTotalExecutions()
     local key = getgenv().key or ""
-    local requestUrl = SUPABASE_URL .. "/logs?key=eq." .. key .. "&select=count"
+    local requestUrl = SUPABASE_URL .. "/logs?key=eq." .. key
     local response = HttpRequestFunc({
         Url = requestUrl,
         Method = "GET",
@@ -359,18 +359,17 @@ local function getTotalExecutions()
             ["Content-Type"] = "application/json",
             ["Authorization"] = "Bearer " .. SUPABASE_ANON_KEY,
             ["apikey"] = SUPABASE_ANON_KEY,
-            ["Prefer"] = "count=exact"
+            ["Range"] = "0-999" -- Fetch up to 1000 entries
         }
     })
     if response and response.Body and response.StatusCode == 200 then
         local data = HttpService:JSONDecode(response.Body)
         if data and type(data) == "table" then
-            local countHeader = response.Headers["content-range"]
-            if countHeader then
-                local count = tonumber(countHeader:match("/(%d+)")) or #data
-                return count
+            local count = 0
+            for _ in pairs(data) do
+                count = count + 1
             end
-            return #data
+            return count
         end
     end
     print("❌ Failed to fetch logs: Status " .. (response and response.StatusCode or "No response"))
@@ -384,10 +383,10 @@ ScreenGui.Name = "AnimeFruitGUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.IgnoreGuiInset = true
 
--- Main Frame (Horizontal)
+-- Main Frame (Horizontal, Extended Height)
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 350, 0, 150)
-Frame.Position = UDim2.new(0.5, -175, 0.5, -75)
+Frame.Size = UDim2.new(0, 350, 0, 180)
+Frame.Position = UDim2.new(0.5, -175, 0.5, -90)
 Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
@@ -466,7 +465,7 @@ end)
 -- Gem Button
 local GemButton = Instance.new("TextButton")
 GemButton.Size = UDim2.new(0, 100, 0, 40)
-GemButton.Position = UDim2.new(0.5, -110, 0.5, 5)
+GemButton.Position = UDim2.new(0.5, -110, 0.5, 10)
 GemButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 GemButton.Text = "Gem 99k"
 GemButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -481,7 +480,7 @@ GemUICorner.Parent = GemButton
 -- Coins Button
 local CoinsButton = Instance.new("TextButton")
 CoinsButton.Size = UDim2.new(0, 100, 0, 40)
-CoinsButton.Position = UDim2.new(0.5, 10, 0.5, 5)
+CoinsButton.Position = UDim2.new(0.5, 10, 0.5, 10)
 CoinsButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 CoinsButton.Text = "Coins 100M"
 CoinsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -527,7 +526,7 @@ animateCreator()
 -- Note Frame
 local NoteFrame = Instance.new("Frame")
 NoteFrame.Size = UDim2.new(0, 300, 0, 20)
-NoteFrame.Position = UDim2.new(0.5, -150, 1, -25)
+NoteFrame.Position = UDim2.new(0.5, -150, 1, -30)
 NoteFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 NoteFrame.BorderSizePixel = 0
 NoteFrame.Parent = Frame
@@ -544,13 +543,13 @@ local statusColor = scriptStatus == "w" and Color3.fromRGB(150, 255, 150) or Col
 
 local NoteText = Instance.new("TextLabel")
 NoteText.Size = UDim2.new(1, -30, 1, 0)
-NoteText.Position = UDim2.new(0, 5, 0, 0)
+NoteText.Position = UDim2.new(0, 15, 0, 0)
 NoteText.BackgroundTransparency = 1
 NoteText.Text = "Exploit: " .. exploit .. " / Total Executions: " .. totalExecutions .. " / Status: " .. statusText
 NoteText.TextColor3 = Color3.fromRGB(200, 200, 200)
 NoteText.TextSize = 10
 NoteText.Font = Enum.Font.SourceSans
-NoteText.TextXAlignment = Enum.TextXAlignment.Left
+NoteText.TextXAlignment = Enum.TextXAlignment.Center
 NoteText.Parent = NoteFrame
 
 -- Status Dot with Neon Animation
