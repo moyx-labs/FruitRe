@@ -6,7 +6,7 @@ local TweenService = game:GetService("TweenInfo")
 -- Create GUI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = LocalPlayer.PlayerGui
-ScreenGui.Name = "AnimeFruitGui"
+ScreenGui.Name = "AnimeFruitGUI"
 ScreenGui.ResetOnSpawn = false
 
 -- Main Frame (Horizontal)
