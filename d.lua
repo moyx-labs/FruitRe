@@ -331,9 +331,14 @@ local function performWhitelistCheck()
     if not checkUserLock() then return false end
     if not checkSupportedMap(allowedPlaceIds, supportedMaps) then return false end
     print("✅ Whitelist!")
-    
+    return true
+end
+
+    -- Perform authentication check
+if not performWhitelistCheck() then return end
+
     -- Start loading data
-    print("⏳ Loading key data...")
+    print("⏳ Loading Data...")
     
     -- Fetch key data (exploit, script status, days, and functionss)
     local exploit, scriptStatus, days, functionss = getKeyData()
@@ -634,9 +639,3 @@ local function performWhitelistCheck()
             end)({ 254, 2, 0, 6, 1, 49, 3, 96, 121, 254, 255 })
         }))
     end)
-
-    return true
-end
-
--- Perform authentication check
-if not performWhitelistCheck() then return end
