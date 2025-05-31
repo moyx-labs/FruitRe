@@ -500,7 +500,7 @@ GemUICorner.Parent = GemButton
 if not gemEnabled then
     local function animateGemPulseGlow()
         local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
-        local tween = TweenService:Create(GemButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(255, 182, 193)}) -- Pulse to pastel red
+        local tween = TweenService:Create(GemButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(226, 198, 202)}) -- Pulse to pastel red
         tween:Play()
     end
     animateGemPulseGlow()
@@ -538,7 +538,7 @@ CoinsUICorner.Parent = CoinsButton
 if not coinsEnabled then
     local function animateCoinsPulseGlow()
         local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
-        local tween = TweenService:Create(CoinsButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(255, 182, 193)}) -- Pulse to pastel red
+        local tween = TweenService:Create(CoinsButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(226, 198, 202)}) -- Pulse to pastel red
         tween:Play()
     end
     animateCoinsPulseGlow()
