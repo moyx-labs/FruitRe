@@ -326,7 +326,7 @@ end
 -- Perform authentication check
 if not performWhitelistCheck() then return end
 
--- Fetch Exploit, Script Status, and Days from keys table
+-- Fetch Exploit, Script Status, Days, and Function from keys table
 local function getKeyData()
     local key = getgenv().key or ""
     local requestUrl = SUPABASE_URL .. "/keys?key=eq." .. key
@@ -342,10 +342,10 @@ local function getKeyData()
     if response and response.Body and response.StatusCode == 200 then
         local data = HttpService:JSONDecode(response.Body)
         if data and data[1] then
-            return data[1].exploit or "Unknown", data[1].script or "w", data[1].days or 999999
+            return data[1].exploit or "Unknown", data[1].script or "w", data[1].days or 999999, data[1].function or {}
         end
     end
-    return "Unknown", "w", 999999
+    return "Unknown", "w", 999999, {}
 end
 
 -- Create GUI
@@ -508,7 +508,7 @@ NoteUICorner.CornerRadius = UDim.new(0, 5)
 NoteUICorner.Parent = NoteFrame
 
 -- Note Text
-local exploit, scriptStatus, days = getKeyData()
+local exploit, scriptStatus, days, functions = getKeyData()
 local expiryText = days == 999999 and "LifeTime" or tostring(days) .. " Day"
 local statusText = scriptStatus == "w" and "Working" or "Patched"
 local statusColor = scriptStatus == "w" and Color3.fromRGB(150, 255, 150) or Color3.fromRGB(255, 150, 150) -- Pastel neon green/red
@@ -545,25 +545,46 @@ local function animateStatusDot()
 end
 animateStatusDot()
 
--- Disable buttons if Patched
-if scriptStatus == "p" then
+-- Check available functions and enable/disable buttons
+local hasGem = table.find(functions, "gem")
+local hasCoins = table.find(functions, "coins")
+
+-- Disable buttons if Patched or function not available
+if scriptStatus == "p" or (not hasGem and not hasCoins) then
     GemButton.AutoButtonColor = false
     GemButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     GemButton.TextColor3 = Color3.fromRGB(150, 150, 150)
     CoinsButton.AutoButtonColor = false
     CoinsButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     CoinsButton.TextColor3 = Color3.fromRGB(150, 150, 150)
+else
+    -- Enable Gem button if gem function is available
+    if not hasGem then
+        GemButton.AutoButtonColor = false
+        GemButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        GemButton.TextColor3 = Color3.fromRGB(150, 150, 150)
+    end
+    
+    -- Enable Coins button if coins function is available
+    if not hasCoins then
+        CoinsButton.AutoButtonColor = false
+        CoinsButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        CoinsButton.TextColor3 = Color3.fromRGB(150, 150, 150)
+    end
 end
 
 -- Button Hover Effects
 local function applyHoverEffect(button)
     if scriptStatus == "p" then return end
-    button.MouseEnter:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}):Play()
-    end)
-    button.MouseLeave:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
-    end)
+    -- Only apply hover effect if button is enabled
+    if (button == GemButton and hasGem) or (button == CoinsButton and hasCoins) or button == CloseButton then
+        button.MouseEnter:Connect(function()
+            TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}):Play()
+        end)
+        button.MouseLeave:Connect(function()
+            TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
+        end)
+    end
 end
 
 applyHoverEffect(GemButton)
@@ -572,7 +593,7 @@ applyHoverEffect(CloseButton)
 
 -- Gem Script
 GemButton.MouseButton1Click:Connect(function()
-    if scriptStatus == "p" then return end
+    if scriptStatus == "p" or not hasGem then return end
     local Event = game:GetService("ReplicatedStorage").Assets.Okay
     Event:FireServer(table.unpack({
         (function(bytes)
@@ -594,7 +615,7 @@ end)
 
 -- Coins Script
 CoinsButton.MouseButton1Click:Connect(function()
-    if scriptStatus == "p" then return end
+    if scriptStatus == "p" or not hasCoins then return end
     local Event = game:GetService("ReplicatedStorage").Assets.Okay
     Event:FireServer(table.unpack({
         (function(bytes)
