@@ -484,7 +484,7 @@ end)
 local GemButton = Instance.new("TextButton")
 GemButton.Size = UDim2.new(0, 100, 0, 40)
 GemButton.Position = UDim2.new(0.5, -110, 0.5, -10)
-GemButton.BackgroundColor3 = gemEnabled and Color3.fromRGB(60, 60, 60) or Color3.fromRGB(255, 245, 145) -- Pastel yellow for disabled
+GemButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Keep gray for both enabled and disabled
 GemButton.Text = "Gem"
 GemButton.TextColor3 = gemEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
 GemButton.TextSize = 18
@@ -495,6 +495,29 @@ GemButton.Parent = Frame
 local GemUICorner = Instance.new("UICorner")
 GemUICorner.CornerRadius = UDim.new(0, 8)
 GemUICorner.Parent = GemButton
+
+-- Gem Animation Overlay (for disabled state)
+if not gemEnabled then
+    local GemOverlay = Instance.new("Frame")
+    GemOverlay.Size = UDim2.new(0.1, 0, 1, 0) -- Thin overlay (10% of button width)
+    GemOverlay.Position = UDim2.new(0, 0, 0, 0)
+    GemOverlay.BackgroundColor3 = Color3.fromRGB(255, 245, 145) -- Pastel yellow
+    GemOverlay.BackgroundTransparency = 0.5 -- Slightly transparent for a subtle effect
+    GemOverlay.BorderSizePixel = 0
+    GemOverlay.Parent = GemButton
+
+    local GemOverlayCorner = Instance.new("UICorner")
+    GemOverlayCorner.CornerRadius = UDim.new(0, 8)
+    GemOverlayCorner.Parent = GemOverlay
+
+    -- Animate the overlay moving left to right
+    local function animateGemOverlay()
+        local tweenInfo = TweenInfo.new(1.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true)
+        local tween = TweenService:Create(GemOverlay, tweenInfo, {Position = UDim2.new(0.9, 0, 0, 0)})
+        tween:Play()
+    end
+    animateGemOverlay()
+end
 
 -- Gem Disable Reason Label
 local GemReasonLabel = Instance.new("TextLabel")
@@ -512,7 +535,7 @@ GemReasonLabel.Parent = Frame
 local CoinsButton = Instance.new("TextButton")
 CoinsButton.Size = UDim2.new(0, 100, 0, 40)
 CoinsButton.Position = UDim2.new(0.5, 10, 0.5, -10)
-CoinsButton.BackgroundColor3 = coinsEnabled and Color3.fromRGB(60, 60, 60) or Color3.fromRGB(255, 245, 145) -- Pastel yellow for disabled
+CoinsButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Keep gray for both enabled and disabled
 CoinsButton.Text = "Coins"
 CoinsButton.TextColor3 = coinsEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
 CoinsButton.TextSize = 18
@@ -523,6 +546,29 @@ CoinsButton.Parent = Frame
 local CoinsUICorner = Instance.new("UICorner")
 CoinsUICorner.CornerRadius = UDim.new(0, 8)
 CoinsUICorner.Parent = CoinsButton
+
+-- Coins Animation Overlay (for disabled state)
+if not coinsEnabled then
+    local CoinsOverlay = Instance.new("Frame")
+    CoinsOverlay.Size = UDim2.new(0.1, 0, 1, 0) -- Thin overlay (10% of button width)
+    CoinsOverlay.Position = UDim2.new(0, 0, 0, 0)
+    CoinsOverlay.BackgroundColor3 = Color3.fromRGB(255, 245, 145) -- Pastel yellow
+    CoinsOverlay.BackgroundTransparency = 0.5 -- Slightly transparent for a subtle effect
+    CoinsOverlay.BorderSizePixel = 0
+    CoinsOverlay.Parent = CoinsButton
+
+    local CoinsOverlayCorner = Instance.new("UICorner")
+    CoinsOverlayCorner.CornerRadius = UDim.new(0, 8)
+    CoinsOverlayCorner.Parent = CoinsOverlay
+
+    -- Animate the overlay moving left to right
+    local function animateCoinsOverlay()
+        local tweenInfo = TweenInfo.new(1.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true)
+        local tween = TweenService:Create(CoinsOverlay, tweenInfo, {Position = UDim2.new(0.9, 0, 0, 0)})
+        tween:Play()
+    end
+    animateCoinsOverlay()
+end
 
 -- Coins Disable Reason Label
 local CoinsReasonLabel = Instance.new("TextLabel")
