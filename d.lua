@@ -54,13 +54,13 @@ end)
 -- Title Label with Smooth Animation
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(0, 200, 0, 40)
-Title.Position = UDim2.new(0.5, -100, 0, 10)
+Title.Position = UDim2.new(0, 15, 0, 10)
 Title.BackgroundTransparency = 1
 Title.Text = "AnimeFruit"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 24
 Title.Font = Enum.Font.FredokaOne
-Title.TextXAlignment = Enum.TextXAlignment.Center
+Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Frame
 
 -- Title animation (smooth pulsing + color shift)
@@ -126,17 +126,43 @@ local Creator = Instance.new("TextLabel")
 Creator.Size = UDim2.new(0, 200, 0, 30)
 Creator.Position = UDim2.new(0.5, -100, 1, -40)
 Creator.BackgroundTransparency = 1
-Creator.Text = "Mo Iamchuasawad"
-Creator.TextColor3 = Color3.fromRGB(255, 255, 255)
+Creator.Text = ""
+Creator.TextColor3 = Color3.fromRGB(200, 200, 200)
 Creator.TextSize = 20
 Creator.Font = Enum.Font.FredokaOne
 Creator.TextXAlignment = Enum.TextXAlignment.Center
 Creator.Parent = Frame
 
--- Creator animation (subtle glow pulse)
+-- "By" Text
+local ByText = Instance.new("TextLabel")
+ByText.Size = UDim2.new(0, 30, 0, 20)
+ByText.Position = UDim2.new(0.5, -60, 1, -40)
+ByText.BackgroundTransparency = 1
+ByText.Text = "By"
+ByText.TextColor3 = Color3.fromRGB(150, 150, 150)
+ByText.TextSize = 14
+ByText.Font = Enum.Font.FredokaOne
+ByText.TextXAlignment = Enum.TextXAlignment.Right
+ByText.Parent = Frame
+
+-- "Mo Iamchuasawad" Text
+local NameText = Instance.new("TextLabel")
+NameText.Size = UDim2.new(0, 150, 0, 20)
+NameText.Position = UDim2.new(0.5, -25, 1, -40)
+NameText.BackgroundTransparency = 1
+NameText.Text = "Mo Iamchuasawad"
+NameText.TextColor3 = Color3.fromRGB(200, 200, 200)
+NameText.TextSize = 20
+NameText.Font = Enum.Font.FredokaOne
+NameText.TextXAlignment = Enum.TextXAlignment.Left
+NameText.Parent = Frame
+
+-- Creator animation (subtle glow pulse for both By and Name)
 local function animateCreator()
-    local colorTween = TweenService:Create(Creator, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(255, 200, 255)})
-    colorTween:Play()
+    local colorTweenBy = TweenService:Create(ByText, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(180, 180, 180)})
+    local colorTweenName = TweenService:Create(NameText, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(220, 220, 220)})
+    colorTweenBy:Play()
+    colorTweenName:Play()
 end
 animateCreator()
 
