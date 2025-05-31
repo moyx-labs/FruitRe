@@ -484,7 +484,7 @@ end)
 local GemButton = Instance.new("TextButton")
 GemButton.Size = UDim2.new(0, 100, 0, 40)
 GemButton.Position = UDim2.new(0.5, -110, 0.5, -10)
-GemButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Gray for both enabled and disabled
+GemButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Gray base color
 GemButton.Text = "Gem"
 GemButton.TextColor3 = gemEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
 GemButton.TextSize = 18
@@ -496,30 +496,14 @@ local GemUICorner = Instance.new("UICorner")
 GemUICorner.CornerRadius = UDim.new(0, 8)
 GemUICorner.Parent = GemButton
 
--- Gem Animation Highlights (for disabled state)
+-- Gem Pulse Glow Animation (for disabled state)
 if not gemEnabled then
-    for i = 1, 3 do
-        local GemHighlight = Instance.new("Frame")
-        GemHighlight.Size = UDim2.new(0.02, 0, 1, 0) -- Very thin highlight (2% of button width)
-        GemHighlight.Position = UDim2.new(-0.02, 0, 0, 0) -- Start off-screen to the left
-        GemHighlight.BackgroundColor3 = Color3.fromRGB(255, 182, 193) -- Pastel red
-        GemHighlight.BackgroundTransparency = 0.7 -- Very subtle highlight
-        GemHighlight.BorderSizePixel = 0
-        GemHighlight.Parent = GemButton
-
-        local GemHighlightCorner = Instance.new("UICorner")
-        GemHighlightCorner.CornerRadius = UDim.new(0, 8)
-        GemHighlightCorner.Parent = GemHighlight
-
-        -- Animate the highlight moving left to right with a slight delay
-        local function animateGemHighlight()
-            task.wait((i - 1) * 0.3) -- Staggered delay for each highlight (0s, 0.3s, 0.6s)
-            local tweenInfo = TweenInfo.new(1.2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true)
-            local tween = TweenService:Create(GemHighlight, tweenInfo, {Position = UDim2.new(1, 0, 0, 0)})
-            tween:Play()
-        end
-        animateGemHighlight()
+    local function animateGemPulseGlow()
+        local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
+        local tween = TweenService:Create(GemButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(255, 182, 193)}) -- Pulse to pastel red
+        tween:Play()
     end
+    animateGemPulseGlow()
 end
 
 -- Gem Disable Reason Label
@@ -538,7 +522,7 @@ GemReasonLabel.Parent = Frame
 local CoinsButton = Instance.new("TextButton")
 CoinsButton.Size = UDim2.new(0, 100, 0, 40)
 CoinsButton.Position = UDim2.new(0.5, 10, 0.5, -10)
-CoinsButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Gray for both enabled and disabled
+CoinsButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Gray base color
 CoinsButton.Text = "Coins"
 CoinsButton.TextColor3 = coinsEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
 CoinsButton.TextSize = 18
@@ -550,30 +534,14 @@ local CoinsUICorner = Instance.new("UICorner")
 CoinsUICorner.CornerRadius = UDim.new(0, 8)
 CoinsUICorner.Parent = CoinsButton
 
--- Coins Animation Highlights (for disabled state)
+-- Coins Pulse Glow Animation (for disabled state)
 if not coinsEnabled then
-    for i = 1, 3 do
-        local CoinsHighlight = Instance.new("Frame")
-        CoinsHighlight.Size = UDim2.new(0.02, 0, 1, 0) -- Very thin highlight (2% of button width)
-        CoinsHighlight.Position = UDim2.new(-0.02, 0, 0, 0) -- Start off-screen to the left
-        CoinsHighlight.BackgroundColor3 = Color3.fromRGB(255, 182, 193) -- Pastel red
-        CoinsHighlight.BackgroundTransparency = 0.7 -- Very subtle highlight
-        CoinsHighlight.BorderSizePixel = 0
-        CoinsHighlight.Parent = CoinsButton
-
-        local CoinsHighlightCorner = Instance.new("UICorner")
-        CoinsHighlightCorner.CornerRadius = UDim.new(0, 8)
-        CoinsHighlightCorner.Parent = CoinsHighlight
-
-        -- Animate the highlight moving left to right with a slight delay
-        local function animateCoinsHighlight()
-            task.wait((i - 1) * 0.3) -- Staggered delay for each highlight (0s, 0.3s, 0.6s)
-            local tweenInfo = TweenInfo.new(1.2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true)
-            local tween = TweenService:Create(CoinsHighlight, tweenInfo, {Position = UDim2.new(1, 0, 0, 0)})
-            tween:Play()
-        end
-        animateCoinsHighlight()
+    local function animateCoinsPulseGlow()
+        local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
+        local tween = TweenService:Create(CoinsButton, tweenInfo, {BackgroundColor3 = Color3.fromRGB(255, 182, 193)}) -- Pulse to pastel red
+        tween:Play()
     end
+    animateCoinsPulseGlow()
 end
 
 -- Coins Disable Reason Label
