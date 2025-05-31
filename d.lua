@@ -326,7 +326,7 @@ end
 -- Perform authentication check
 if not performWhitelistCheck() then return end
 
--- Fetch Exploit and Script Status from keys table
+-- Fetch Exploit, Script Status, and Days from keys table
 local function getKeyData()
     local key = getgenv().key or ""
     local requestUrl = SUPABASE_URL .. "/keys?key=eq." .. key
@@ -342,38 +342,10 @@ local function getKeyData()
     if response and response.Body and response.StatusCode == 200 then
         local data = HttpService:JSONDecode(response.Body)
         if data and data[1] then
-            return data[1].exploit or "Unknown", data[1].script or "w"
+            return data[1].exploit or "Unknown", data[1].script or "w", data[1].days or 999999
         end
     end
-    return "Unknown", "w"
-end
-
--- Fetch Total Executions from logs table
-local function getTotalExecutions()
-    local key = getgenv().key or ""
-    local requestUrl = SUPABASE_URL .. "/logs?key=eq." .. key
-    local response = HttpRequestFunc({
-        Url = requestUrl,
-        Method = "GET",
-        Headers = {
-            ["Content-Type"] = "application/json",
-            ["Authorization"] = "Bearer " .. SUPABASE_ANON_KEY,
-            ["apikey"] = SUPABASE_ANON_KEY,
-            ["Range"] = "0-999" -- Fetch up to 1000 entries
-        }
-    })
-    if response and response.Body and response.StatusCode == 200 then
-        local data = HttpService:JSONDecode(response.Body)
-        if data and type(data) == "table" then
-            local count = 0
-            for _ in pairs(data) do
-                count = count + 1
-            end
-            return count
-        end
-    end
-    print("❌ Failed to fetch logs: Status " .. (response and response.StatusCode or "No response"))
-    return 0
+    return "Unknown", "w", 999999
 end
 
 -- Create GUI
@@ -465,9 +437,9 @@ end)
 -- Gem Button
 local GemButton = Instance.new("TextButton")
 GemButton.Size = UDim2.new(0, 100, 0, 40)
-GemButton.Position = UDim2.new(0.5, -110, 0.5, 10)
+GemButton.Position = UDim2.new(0.5, -110, 0.5, -5)
 GemButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-GemButton.Text = "Gem 99k"
+GemButton.Text = "Gem"
 GemButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 GemButton.TextSize = 18
 GemButton.Font = Enum.Font.SourceSansBold
@@ -480,9 +452,9 @@ GemUICorner.Parent = GemButton
 -- Coins Button
 local CoinsButton = Instance.new("TextButton")
 CoinsButton.Size = UDim2.new(0, 100, 0, 40)
-CoinsButton.Position = UDim2.new(0.5, 10, 0.5, 10)
+CoinsButton.Position = UDim2.new(0.5, 10, 0.5, -5)
 CoinsButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-CoinsButton.Text = "Coins 100M"
+CoinsButton.Text = "Coins"
 CoinsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CoinsButton.TextSize = 18
 CoinsButton.Font = Enum.Font.SourceSansBold
@@ -536,8 +508,8 @@ NoteUICorner.CornerRadius = UDim.new(0, 5)
 NoteUICorner.Parent = NoteFrame
 
 -- Note Text
-local exploit, scriptStatus = getKeyData()
-local totalExecutions = getTotalExecutions()
+local exploit, scriptStatus, days = getKeyData()
+local expiryText = days == 999999 and "LifeTime" or tostring(days) .. " Day"
 local statusText = scriptStatus == "w" and "Working" or "Patched"
 local statusColor = scriptStatus == "w" and Color3.fromRGB(150, 255, 150) or Color3.fromRGB(255, 150, 150) -- Pastel neon green/red
 
@@ -545,7 +517,7 @@ local NoteText = Instance.new("TextLabel")
 NoteText.Size = UDim2.new(1, -30, 1, 0)
 NoteText.Position = UDim2.new(0, 15, 0, 0)
 NoteText.BackgroundTransparency = 1
-NoteText.Text = "Exploit: " .. exploit .. " / Total Executions: " .. totalExecutions .. " / Status: " .. statusText
+NoteText.Text = "Exploit: " .. exploit .. " / Expired at: " .. expiryText .. " / Status: " .. statusText
 NoteText.TextColor3 = Color3.fromRGB(200, 200, 200)
 NoteText.TextSize = 10
 NoteText.Font = Enum.Font.SourceSans
