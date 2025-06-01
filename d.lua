@@ -411,13 +411,13 @@ ScreenGui.Parent = playerGui
 ScreenGui.Name = "AnimeFruitGUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.IgnoreGuiInset = true
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global -- Ensure GUI is always on top
-ScreenGui.DisplayOrder = 999 -- High display order to ensure topmost visibility
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global 
+ScreenGui.DisplayOrder = 999 
 
--- Main Frame (Adjusted size for balanced layout)
+-- Main Frame 
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 400, 0, 250) -- Adjusted width to fit 4 buttons in a row
-Frame.Position = UDim2.new(0.5, -200, 0.5, -125) -- Centered
+Frame.Size = UDim2.new(0, 400, 0, 250)
+Frame.Position = UDim2.new(0.5, -200, 0.5, -125)
 Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
@@ -486,15 +486,16 @@ CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
+-- Second Row: Summon 150, Summon 300, Summon 500 
 local buttonWidth = 85 
 local buttonHeight = 30
 local spacing = 10 
 local rowHeight = 50 
 
--- First Row: Gem, Coins, Get Food, Feed Lvl
+-- First Row: Gem, Coins, Get Food, Feed Lvl 
 local GemButton = Instance.new("TextButton")
 GemButton.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-GemButton.Position = UDim2.new(0.5, -2 * (buttonWidth + spacing), 0, 60)
+GemButton.Position = UDim2.new(0.5, -2 * (buttonWidth + spacing), 0, 80) 
 GemButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 GemButton.Text = "Gem"
 GemButton.TextColor3 = gemEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
@@ -518,7 +519,7 @@ end
 
 local GemReasonLabel = Instance.new("TextLabel")
 GemReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
-GemReasonLabel.Position = UDim2.new(0.5, -2 * (buttonWidth + spacing), 0, 90)
+GemReasonLabel.Position = UDim2.new(0.5, -2 * (buttonWidth + spacing), 0, 110) 
 GemReasonLabel.BackgroundTransparency = 1
 GemReasonLabel.Text = gemDisableReason
 GemReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -529,7 +530,7 @@ GemReasonLabel.Parent = Frame
 
 local CoinsButton = Instance.new("TextButton")
 CoinsButton.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-CoinsButton.Position = UDim2.new(0.5, -1 * (buttonWidth + spacing), 0, 60)
+CoinsButton.Position = UDim2.new(0.5, -1 * (buttonWidth + spacing), 0, 80) 
 CoinsButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 CoinsButton.Text = "Coins"
 CoinsButton.TextColor3 = coinsEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
@@ -553,7 +554,7 @@ end
 
 local CoinsReasonLabel = Instance.new("TextLabel")
 CoinsReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
-CoinsReasonLabel.Position = UDim2.new(0.5, -1 * (buttonWidth + spacing), 0, 90)
+CoinsReasonLabel.Position = UDim2.new(0.5, -1 * (buttonWidth + spacing), 0, 110) 
 CoinsReasonLabel.BackgroundTransparency = 1
 CoinsReasonLabel.Text = coinsDisableReason
 CoinsReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -564,7 +565,7 @@ CoinsReasonLabel.Parent = Frame
 
 local GetFoodButton = Instance.new("TextButton")
 GetFoodButton.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-GetFoodButton.Position = UDim2.new(0.5, 0 * (buttonWidth + spacing), 0, 60)
+GetFoodButton.Position = UDim2.new(0.5, 0 * (buttonWidth + spacing), 0, 80) 
 GetFoodButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 GetFoodButton.Text = "Get Food"
 GetFoodButton.TextColor3 = foodEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
@@ -588,7 +589,7 @@ end
 
 local GetFoodReasonLabel = Instance.new("TextLabel")
 GetFoodReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
-GetFoodReasonLabel.Position = UDim2.new(0.5, 0 * (buttonWidth + spacing), 0, 90)
+GetFoodReasonLabel.Position = UDim2.new(0.5, 0 * (buttonWidth + spacing), 0, 110) 
 GetFoodReasonLabel.BackgroundTransparency = 1
 GetFoodReasonLabel.Text = foodDisableReason
 GetFoodReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -599,7 +600,7 @@ GetFoodReasonLabel.Parent = Frame
 
 local FeedLvlButton = Instance.new("TextButton")
 FeedLvlButton.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-FeedLvlButton.Position = UDim2.new(0.5, 1 * (buttonWidth + spacing), 0, 60)
+FeedLvlButton.Position = UDim2.new(0.5, 1 * (buttonWidth + spacing), 0, 80) 
 FeedLvlButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 FeedLvlButton.Text = "Feed Lvl"
 FeedLvlButton.TextColor3 = lvlEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
@@ -623,7 +624,7 @@ end
 
 local FeedLvlReasonLabel = Instance.new("TextLabel")
 FeedLvlReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
-FeedLvlReasonLabel.Position = UDim2.new(0.5, 1 * (buttonWidth + spacing), 0, 90)
+FeedLvlReasonLabel.Position = UDim2.new(0.5, 1 * (buttonWidth + spacing), 0, 110)
 FeedLvlReasonLabel.BackgroundTransparency = 1
 FeedLvlReasonLabel.Text = lvlDisableReason
 FeedLvlReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -632,10 +633,10 @@ FeedLvlReasonLabel.Font = Enum.Font.SourceSans
 FeedLvlReasonLabel.TextXAlignment = Enum.TextXAlignment.Center
 FeedLvlReasonLabel.Parent = Frame
 
--- Second Row: Summon 150, Summon 300, Summon 500
+-- Second Row: Summon 150, Summon 300, Summon 500 (3 buttons, centered)
 local Summon150Button = Instance.new("TextButton")
 Summon150Button.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-Summon150Button.Position = UDim2.new(0.5, -1 * (buttonWidth + spacing), 0, 60 + rowHeight)
+Summon150Button.Position = UDim2.new(0.5, -1 * (buttonWidth + spacing), 0, 80 + rowHeight) 
 Summon150Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 Summon150Button.Text = "Summon 150"
 Summon150Button.TextColor3 = summonsEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
@@ -659,7 +660,7 @@ end
 
 local Summon150ReasonLabel = Instance.new("TextLabel")
 Summon150ReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
-Summon150ReasonLabel.Position = UDim2.new(0.5, -1 * (buttonWidth + spacing), 0, 90 + rowHeight)
+Summon150ReasonLabel.Position = UDim2.new(0.5, -1 * (buttonWidth + spacing), 0, 110 + rowHeight) 
 Summon150ReasonLabel.BackgroundTransparency = 1
 Summon150ReasonLabel.Text = summonsDisableReason
 Summon150ReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -670,7 +671,7 @@ Summon150ReasonLabel.Parent = Frame
 
 local Summon300Button = Instance.new("TextButton")
 Summon300Button.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-Summon300Button.Position = UDim2.new(0.5, 0 * (buttonWidth + spacing), 0, 60 + rowHeight)
+Summon300Button.Position = UDim2.new(0.5, 0 * (buttonWidth + spacing), 0, 80 + rowHeight)
 Summon300Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 Summon300Button.Text = "Summon 300"
 Summon300Button.TextColor3 = summonsEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
@@ -694,7 +695,7 @@ end
 
 local Summon300ReasonLabel = Instance.new("TextLabel")
 Summon300ReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
-Summon300ReasonLabel.Position = UDim2.new(0.5, 0 * (buttonWidth + spacing), 0, 90 + rowHeight)
+Summon300ReasonLabel.Position = UDim2.new(0.5, 0 * (buttonWidth + spacing), 0, 110 + rowHeight) 
 Summon300ReasonLabel.BackgroundTransparency = 1
 Summon300ReasonLabel.Text = summonsDisableReason
 Summon300ReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -705,7 +706,7 @@ Summon300ReasonLabel.Parent = Frame
 
 local Summon500Button = Instance.new("TextButton")
 Summon500Button.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-Summon500Button.Position = UDim2.new(0.5, 1 * (buttonWidth + spacing), 0, 60 + rowHeight)
+Summon500Button.Position = UDim2.new(0.5, 1 * (buttonWidth + spacing), 0, 80 + rowHeight) 
 Summon500Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 Summon500Button.Text = "Summon 500"
 Summon500Button.TextColor3 = summonsEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
@@ -729,7 +730,7 @@ end
 
 local Summon500ReasonLabel = Instance.new("TextLabel")
 Summon500ReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
-Summon500ReasonLabel.Position = UDim2.new(0.5, 1 * (buttonWidth + spacing), 0, 90 + rowHeight)
+Summon500ReasonLabel.Position = UDim2.new(0.5, 1 * (buttonWidth + spacing), 0, 110 + rowHeight)
 Summon500ReasonLabel.BackgroundTransparency = 1
 Summon500ReasonLabel.Text = summonsDisableReason
 Summon500ReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -738,7 +739,7 @@ Summon500ReasonLabel.Font = Enum.Font.SourceSans
 Summon500ReasonLabel.TextXAlignment = Enum.TextXAlignment.Center
 Summon500ReasonLabel.Parent = Frame
 
--- "By" 
+-- "By" Text
 local ByText = Instance.new("TextLabel")
 ByText.Size = UDim2.new(0, 30, 0, 20)
 ByText.Position = UDim2.new(0, 15, 0, 40)
@@ -762,7 +763,7 @@ NameText.Font = Enum.Font.FredokaOne
 NameText.TextXAlignment = Enum.TextXAlignment.Left
 NameText.Parent = Frame
 
--- Creator animation 
+-- Creator animation
 local function animateCreator()
     local colorTweenName = TweenService:Create(NameText, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(255, 220, 220)})
     colorTweenName:Play()
