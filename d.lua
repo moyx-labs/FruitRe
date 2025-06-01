@@ -835,7 +835,7 @@ applyHoverEffect(CloseButton, true)
 -- Gem Script
 GemButton.MouseButton1Click:Connect(function()
     if not gemEnabled then return end
-    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 83}) do
+    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73} or {71, 83}) do
         local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
         Event:FireServer(table.unpack({
             (function(bytes)
@@ -859,7 +859,7 @@ end)
 -- Coins Script
 CoinsButton.MouseButton1Click:Connect(function()
     if not coinsEnabled then return end
-    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 83}) do
+    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73} or {71, 83}) do
         local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
         Event:FireServer(table.unpack({
             (function(bytes)
@@ -880,7 +880,7 @@ CoinsButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Get Food Script (Executes all food functions: Rice, Pasta, Meat)
+-- Get Food Script
 GetFoodButton.MouseButton1Click:Connect(function()
     if not foodEnabled then return end
     local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
@@ -959,7 +959,7 @@ GetFoodButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Feed Lvl Script
+-- Feed Lvl
 FeedLvlButton.MouseButton1Click:Connect(function()
     if not lvlEnabled then return end
     local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
@@ -986,7 +986,7 @@ end)
 -- Summon 150 Script
 Summon150Button.MouseButton1Click:Connect(function()
     if not summonsEnabled then return end
-    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 83}) do
+    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73} or {71, 83}) do
         local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
         Event:FireServer(table.unpack({
             (function(bytes)
@@ -1026,7 +1026,7 @@ end)
 -- Summon 300 Script
 Summon300Button.MouseButton1Click:Connect(function()
     if not summonsEnabled then return end
-    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 83}) do
+    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73} or {71, 83}) do
         local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
         Event:FireServer(table.unpack({
             (function(bytes)
@@ -1066,7 +1066,7 @@ end)
 -- Summon 500 Script
 Summon500Button.MouseButton1Click:Connect(function()
     if not summonsEnabled then return end
-    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 83}) do
+    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73} or {71, 83}) do
         local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
         Event:FireServer(table.unpack({
             (function(bytes)
