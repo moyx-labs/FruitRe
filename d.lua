@@ -378,17 +378,17 @@ end
 
 -- Load key data
 local exploit, scriptStatus, days, functionss = getKeyData()
-print("Functionss retrieved:", functionss) -- Debug print to inspect the value
+print("Functionss retrieved:", functionss) 
 
 -- Wait for game to load
 repeat task.wait() until game:IsLoaded()
 
--- Determine button states (assuming scriptStatus, functionss, and findInTable are defined in main script)
+-- Determine button states
 local hasGem = findInTable(functionss, "gem")
 local hasCoins = findInTable(functionss, "coins")
-local hasFood = findInTable(functionss, "food") -- For Get Food
-local hasLvl = findInTable(functionss, "lvl") -- For Feed Lvl
-local hasSummons = findInTable(functionss, "summons") -- For Summons
+local hasFood = findInTable(functionss, "food")
+local hasLvl = findInTable(functionss, "lvl")
+local hasSummons = findInTable(functionss, "summons")
 
 local gemEnabled = scriptStatus == "w" and hasGem
 local coinsEnabled = scriptStatus == "w" and hasCoins
@@ -411,11 +411,13 @@ ScreenGui.Parent = playerGui
 ScreenGui.Name = "AnimeFruitGUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.IgnoreGuiInset = true
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global -- Ensure GUI is always on top
+ScreenGui.DisplayOrder = 999 -- High display order to ensure topmost visibility
 
--- Main Frame (Horizontal, Extended Height to accommodate more buttons)
+-- Main Frame (Adjusted size for balanced layout)
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 350, 0, 250) -- Increased height to fit more buttons
-Frame.Position = UDim2.new(0.5, -175, 0.5, -125)
+Frame.Size = UDim2.new(0, 400, 0, 250) -- Adjusted width to fit 4 buttons in a row
+Frame.Position = UDim2.new(0.5, -200, 0.5, -125) -- Centered
 Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
@@ -453,7 +455,7 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
--- Title Label with Smooth Animation (Size Only)
+-- Title Label
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(0, 200, 0, 40)
 Title.Position = UDim2.new(0, 15, 0, 5)
@@ -484,15 +486,19 @@ CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Adjust button sizes and positions to fit more buttons
--- First Row: Gem, Coins, Get Food
+local buttonWidth = 85 
+local buttonHeight = 30
+local spacing = 10 
+local rowHeight = 50 
+
+-- First Row: Gem, Coins, Get Food, Feed Lvl
 local GemButton = Instance.new("TextButton")
-GemButton.Size = UDim2.new(0, 80, 0, 30) -- Smaller button size
-GemButton.Position = UDim2.new(0.5, -120, 0.5, -60)
+GemButton.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+GemButton.Position = UDim2.new(0.5, -2 * (buttonWidth + spacing), 0, 60)
 GemButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 GemButton.Text = "Gem"
 GemButton.TextColor3 = gemEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
-GemButton.TextSize = 14
+GemButton.TextSize = 12
 GemButton.Font = Enum.Font.SourceSansBold
 GemButton.AutoButtonColor = gemEnabled
 GemButton.Parent = Frame
@@ -511,8 +517,8 @@ if not gemEnabled then
 end
 
 local GemReasonLabel = Instance.new("TextLabel")
-GemReasonLabel.Size = UDim2.new(0, 80, 0, 15)
-GemReasonLabel.Position = UDim2.new(0.5, -120, 0.5, -30)
+GemReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
+GemReasonLabel.Position = UDim2.new(0.5, -2 * (buttonWidth + spacing), 0, 90)
 GemReasonLabel.BackgroundTransparency = 1
 GemReasonLabel.Text = gemDisableReason
 GemReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -522,12 +528,12 @@ GemReasonLabel.TextXAlignment = Enum.TextXAlignment.Center
 GemReasonLabel.Parent = Frame
 
 local CoinsButton = Instance.new("TextButton")
-CoinsButton.Size = UDim2.new(0, 80, 0, 30)
-CoinsButton.Position = UDim2.new(0.5, -40, 0.5, -60)
+CoinsButton.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+CoinsButton.Position = UDim2.new(0.5, -1 * (buttonWidth + spacing), 0, 60)
 CoinsButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 CoinsButton.Text = "Coins"
 CoinsButton.TextColor3 = coinsEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
-CoinsButton.TextSize = 14
+CoinsButton.TextSize = 12
 CoinsButton.Font = Enum.Font.SourceSansBold
 CoinsButton.AutoButtonColor = coinsEnabled
 CoinsButton.Parent = Frame
@@ -546,8 +552,8 @@ if not coinsEnabled then
 end
 
 local CoinsReasonLabel = Instance.new("TextLabel")
-CoinsReasonLabel.Size = UDim2.new(0, 80, 0, 15)
-CoinsReasonLabel.Position = UDim2.new(0.5, -40, 0.5, -30)
+CoinsReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
+CoinsReasonLabel.Position = UDim2.new(0.5, -1 * (buttonWidth + spacing), 0, 90)
 CoinsReasonLabel.BackgroundTransparency = 1
 CoinsReasonLabel.Text = coinsDisableReason
 CoinsReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -557,12 +563,12 @@ CoinsReasonLabel.TextXAlignment = Enum.TextXAlignment.Center
 CoinsReasonLabel.Parent = Frame
 
 local GetFoodButton = Instance.new("TextButton")
-GetFoodButton.Size = UDim2.new(0, 80, 0, 30)
-GetFoodButton.Position = UDim2.new(0.5, 40, 0.5, -60)
+GetFoodButton.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+GetFoodButton.Position = UDim2.new(0.5, 0 * (buttonWidth + spacing), 0, 60)
 GetFoodButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 GetFoodButton.Text = "Get Food"
 GetFoodButton.TextColor3 = foodEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
-GetFoodButton.TextSize = 14
+GetFoodButton.TextSize = 12
 GetFoodButton.Font = Enum.Font.SourceSansBold
 GetFoodButton.AutoButtonColor = foodEnabled
 GetFoodButton.Parent = Frame
@@ -581,8 +587,8 @@ if not foodEnabled then
 end
 
 local GetFoodReasonLabel = Instance.new("TextLabel")
-GetFoodReasonLabel.Size = UDim2.new(0, 80, 0, 15)
-GetFoodReasonLabel.Position = UDim2.new(0.5, 40, 0.5, -30)
+GetFoodReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
+GetFoodReasonLabel.Position = UDim2.new(0.5, 0 * (buttonWidth + spacing), 0, 90)
 GetFoodReasonLabel.BackgroundTransparency = 1
 GetFoodReasonLabel.Text = foodDisableReason
 GetFoodReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -591,14 +597,13 @@ GetFoodReasonLabel.Font = Enum.Font.SourceSans
 GetFoodReasonLabel.TextXAlignment = Enum.TextXAlignment.Center
 GetFoodReasonLabel.Parent = Frame
 
--- Second Row: Feed Lvl, Summon 150, Summon 300, Summon 500
 local FeedLvlButton = Instance.new("TextButton")
-FeedLvlButton.Size = UDim2.new(0, 80, 0, 30)
-FeedLvlButton.Position = UDim2.new(0.5, -120, 0.5, 0)
+FeedLvlButton.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+FeedLvlButton.Position = UDim2.new(0.5, 1 * (buttonWidth + spacing), 0, 60)
 FeedLvlButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 FeedLvlButton.Text = "Feed Lvl"
 FeedLvlButton.TextColor3 = lvlEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
-FeedLvlButton.TextSize = 14
+FeedLvlButton.TextSize = 12
 FeedLvlButton.Font = Enum.Font.SourceSansBold
 FeedLvlButton.AutoButtonColor = lvlEnabled
 FeedLvlButton.Parent = Frame
@@ -617,8 +622,8 @@ if not lvlEnabled then
 end
 
 local FeedLvlReasonLabel = Instance.new("TextLabel")
-FeedLvlReasonLabel.Size = UDim2.new(0, 80, 0, 15)
-FeedLvlReasonLabel.Position = UDim2.new(0.5, -120, 0.5, 30)
+FeedLvlReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
+FeedLvlReasonLabel.Position = UDim2.new(0.5, 1 * (buttonWidth + spacing), 0, 90)
 FeedLvlReasonLabel.BackgroundTransparency = 1
 FeedLvlReasonLabel.Text = lvlDisableReason
 FeedLvlReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -627,13 +632,14 @@ FeedLvlReasonLabel.Font = Enum.Font.SourceSans
 FeedLvlReasonLabel.TextXAlignment = Enum.TextXAlignment.Center
 FeedLvlReasonLabel.Parent = Frame
 
+-- Second Row: Summon 150, Summon 300, Summon 500
 local Summon150Button = Instance.new("TextButton")
-Summon150Button.Size = UDim2.new(0, 80, 0, 30)
-Summon150Button.Position = UDim2.new(0.5, -40, 0.5, 0)
+Summon150Button.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+Summon150Button.Position = UDim2.new(0.5, -1 * (buttonWidth + spacing), 0, 60 + rowHeight)
 Summon150Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 Summon150Button.Text = "Summon 150"
 Summon150Button.TextColor3 = summonsEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
-Summon150Button.TextSize = 14
+Summon150Button.TextSize = 12
 Summon150Button.Font = Enum.Font.SourceSansBold
 Summon150Button.AutoButtonColor = summonsEnabled
 Summon150Button.Parent = Frame
@@ -652,8 +658,8 @@ if not summonsEnabled then
 end
 
 local Summon150ReasonLabel = Instance.new("TextLabel")
-Summon150ReasonLabel.Size = UDim2.new(0, 80, 0, 15)
-Summon150ReasonLabel.Position = UDim2.new(0.5, -40, 0.5, 30)
+Summon150ReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
+Summon150ReasonLabel.Position = UDim2.new(0.5, -1 * (buttonWidth + spacing), 0, 90 + rowHeight)
 Summon150ReasonLabel.BackgroundTransparency = 1
 Summon150ReasonLabel.Text = summonsDisableReason
 Summon150ReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -663,12 +669,12 @@ Summon150ReasonLabel.TextXAlignment = Enum.TextXAlignment.Center
 Summon150ReasonLabel.Parent = Frame
 
 local Summon300Button = Instance.new("TextButton")
-Summon300Button.Size = UDim2.new(0, 80, 0, 30)
-Summon300Button.Position = UDim2.new(0.5, 40, 0.5, 0)
+Summon300Button.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+Summon300Button.Position = UDim2.new(0.5, 0 * (buttonWidth + spacing), 0, 60 + rowHeight)
 Summon300Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 Summon300Button.Text = "Summon 300"
 Summon300Button.TextColor3 = summonsEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
-Summon300Button.TextSize = 14
+Summon300Button.TextSize = 12
 Summon300Button.Font = Enum.Font.SourceSansBold
 Summon300Button.AutoButtonColor = summonsEnabled
 Summon300Button.Parent = Frame
@@ -687,8 +693,8 @@ if not summonsEnabled then
 end
 
 local Summon300ReasonLabel = Instance.new("TextLabel")
-Summon300ReasonLabel.Size = UDim2.new(0, 80, 0, 15)
-Summon300ReasonLabel.Position = UDim2.new(0.5, 40, 0.5, 30)
+Summon300ReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
+Summon300ReasonLabel.Position = UDim2.new(0.5, 0 * (buttonWidth + spacing), 0, 90 + rowHeight)
 Summon300ReasonLabel.BackgroundTransparency = 1
 Summon300ReasonLabel.Text = summonsDisableReason
 Summon300ReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -698,12 +704,12 @@ Summon300ReasonLabel.TextXAlignment = Enum.TextXAlignment.Center
 Summon300ReasonLabel.Parent = Frame
 
 local Summon500Button = Instance.new("TextButton")
-Summon500Button.Size = UDim2.new(0, 80, 0, 30)
-Summon500Button.Position = UDim2.new(0.5, 120, 0.5, 0)
+Summon500Button.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+Summon500Button.Position = UDim2.new(0.5, 1 * (buttonWidth + spacing), 0, 60 + rowHeight)
 Summon500Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 Summon500Button.Text = "Summon 500"
 Summon500Button.TextColor3 = summonsEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
-Summon500Button.TextSize = 14
+Summon500Button.TextSize = 12
 Summon500Button.Font = Enum.Font.SourceSansBold
 Summon500Button.AutoButtonColor = summonsEnabled
 Summon500Button.Parent = Frame
@@ -722,8 +728,8 @@ if not summonsEnabled then
 end
 
 local Summon500ReasonLabel = Instance.new("TextLabel")
-Summon500ReasonLabel.Size = UDim2.new(0, 80, 0, 15)
-Summon500ReasonLabel.Position = UDim2.new(0.5, 120, 0.5, 30)
+Summon500ReasonLabel.Size = UDim2.new(0, buttonWidth, 0, 15)
+Summon500ReasonLabel.Position = UDim2.new(0.5, 1 * (buttonWidth + spacing), 0, 90 + rowHeight)
 Summon500ReasonLabel.BackgroundTransparency = 1
 Summon500ReasonLabel.Text = summonsDisableReason
 Summon500ReasonLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -732,7 +738,7 @@ Summon500ReasonLabel.Font = Enum.Font.SourceSans
 Summon500ReasonLabel.TextXAlignment = Enum.TextXAlignment.Center
 Summon500ReasonLabel.Parent = Frame
 
--- "By" Text
+-- "By" 
 local ByText = Instance.new("TextLabel")
 ByText.Size = UDim2.new(0, 30, 0, 20)
 ByText.Position = UDim2.new(0, 15, 0, 40)
@@ -756,7 +762,7 @@ NameText.Font = Enum.Font.FredokaOne
 NameText.TextXAlignment = Enum.TextXAlignment.Left
 NameText.Parent = Frame
 
--- Creator animation (soft pink glow for NameText only)
+-- Creator animation 
 local function animateCreator()
     local colorTweenName = TweenService:Create(NameText, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(255, 220, 220)})
     colorTweenName:Play()
@@ -885,6 +891,7 @@ GetFoodButton.MouseButton1Click:Connect(function()
     if not foodEnabled then return end
     local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
     for _, byte in ipairs({126, 118}) do 
+
         -- Rice
         Event:FireServer(table.unpack({
             (function(bytes)
@@ -922,22 +929,22 @@ GetFoodButton.MouseButton1Click:Connect(function()
         }))
 
         -- Cake
-    Event:FireServer(table.unpack({
-    (function(bytes) 
-        local b = buffer.create(#bytes)
-        for i = 1, #bytes do
-            buffer.writeu8(b, i - 1, bytes[i])
-        end
-        return b
-    end)({ byte }),
-    (function(bytes) 
-        local b = buffer.create(#bytes)
-        for i = 1, #bytes do
-            buffer.writeu8(b, i - 1, bytes[i])
-        end
-        return b
-    end)({ 254, 2, 0, 6, 3, 51, 48, 49, 253, 1, 0, 6, 1, 52, 3, 50, 251, 511, 255 })
-}))
+        Event:FireServer(table.unpack({
+            (function(bytes) 
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ byte }),
+            (function(bytes) 
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ 254, 2, 0, 6, 3, 51, 48, 49, 253, 1, 0, 6, 1, 52, 3, 50, 251, 511, 255 })
+        }))
         
         -- Meat
         Event:FireServer(table.unpack({
@@ -959,7 +966,7 @@ GetFoodButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Feed Lvl
+-- Feed Lvl Script
 FeedLvlButton.MouseButton1Click:Connect(function()
     if not lvlEnabled then return end
     local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
