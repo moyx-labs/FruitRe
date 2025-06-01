@@ -900,7 +900,7 @@ GetFoodButton.MouseButton1Click:Connect(function()
                     buffer.writeu8(b, i - 1, bytes[i])
                 end
                 return b
-            end)({ 254, 2, 0, 6, 3, 52, 48, 50, 253, 1, 0, 6, 1, 49, 3, 192, 189, 240, 255 })
+            end)({ 254, 2, 0, 6, 3, 52, 48, 50, 253, 1, 0, 6, 1, 49, 3, 50, 251, 511, 255 })
         }))
         
         -- Pasta
@@ -918,8 +918,26 @@ GetFoodButton.MouseButton1Click:Connect(function()
                     buffer.writeu8(b, i - 1, bytes[i])
                 end
                 return b
-            end)({ 254, 2, 0, 6, 3, 52, 48, 51, 253, 1, 0, 6, 1, 51, 3, 192, 189, 240, 255 })
+            end)({ 254, 2, 0, 6, 3, 52, 48, 51, 253, 1, 0, 6, 1, 51, 3, 50, 251, 511, 255 })
         }))
+
+        -- Cake
+    Event:FireServer(table.unpack({
+    (function(bytes) 
+        local b = buffer.create(#bytes)
+        for i = 1, #bytes do
+            buffer.writeu8(b, i - 1, bytes[i])
+        end
+        return b
+    end)({ byte }),
+    (function(bytes) 
+        local b = buffer.create(#bytes)
+        for i = 1, #bytes do
+            buffer.writeu8(b, i - 1, bytes[i])
+        end
+        return b
+    end)({ 254, 2, 0, 6, 3, 51, 48, 49, 253, 1, 0, 6, 1, 52, 3, 50, 251, 511, 255 })
+}))
         
         -- Meat
         Event:FireServer(table.unpack({
@@ -936,7 +954,7 @@ GetFoodButton.MouseButton1Click:Connect(function()
                     buffer.writeu8(b, i - 1, bytes[i])
                 end
                 return b
-            end)({ 254, 2, 0, 6, 3, 52, 48, 50, 253, 1, 0, 6, 1, 53, 3, 192, 189, 240, 255 })
+            end)({ 254, 2, 0, 6, 3, 52, 48, 50, 253, 1, 0, 6, 1, 53, 3, 50, 251, 511, 255 })
         }))
     end
 end)
