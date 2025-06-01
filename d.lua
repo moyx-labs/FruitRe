@@ -891,7 +891,7 @@ end)
 GetFoodButton.MouseButton1Click:Connect(function()
     if not foodEnabled then return end
     local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
-    for _, byte in ipairs({126, 118}) do 
+    for _, byte in ipairs({126, 118, 80}) do 
 
         -- Rice
         Event:FireServer(table.unpack({
