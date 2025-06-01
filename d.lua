@@ -380,6 +380,9 @@ end
 local exploit, scriptStatus, days, functionss = getKeyData()
 print("Functionss retrieved:", functionss) -- Debug print to inspect the value
 
+-- Wait for game to load
+repeat task.wait() until game:IsLoaded()
+
 -- Determine button states (assuming scriptStatus, functionss, and findInTable are defined in main script)
 local hasGem = findInTable(functionss, "gem")
 local hasCoins = findInTable(functionss, "coins")
@@ -832,7 +835,7 @@ applyHoverEffect(CloseButton, true)
 -- Gem Script
 GemButton.MouseButton1Click:Connect(function()
     if not gemEnabled then return end
-    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 63, 83}) do
+    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 83}) do
         local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
         Event:FireServer(table.unpack({
             (function(bytes)
@@ -851,13 +854,12 @@ GemButton.MouseButton1Click:Connect(function()
             end)({ 254, 2, 0, 6, 1, 50, 2, 25, 252 })
         }))
     end
-    print("✅ Gem Executed!")
 end)
 
 -- Coins Script
 CoinsButton.MouseButton1Click:Connect(function()
     if not coinsEnabled then return end
-    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 63, 83}) do
+    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 83}) do
         local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
         Event:FireServer(table.unpack({
             (function(bytes)
@@ -876,97 +878,97 @@ CoinsButton.MouseButton1Click:Connect(function()
             end)({ 254, 2, 0, 6, 1, 49, 3, 96, 121, 254, 255 })
         }))
     end
-    print("✅ Coins Executed!")
 end)
 
 -- Get Food Script (Executes all food functions: Rice, Pasta, Meat)
 GetFoodButton.MouseButton1Click:Connect(function()
     if not foodEnabled then return end
     local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
-    
-    -- Rice
-    Event:FireServer(table.unpack({
-        (function(bytes)
-            local b = buffer.create(#bytes)
-            for i = 1, #bytes do
-                buffer.writeu8(b, i - 1, bytes[i])
-            end
-            return b
-        end)({ 126 }),
-        (function(bytes)
-            local b = buffer.create(#bytes)
-            for i = 1, #bytes do
-                buffer.writeu8(b, i - 1, bytes[i])
-            end
-            return b
-        end)({ 254, 2, 0, 6, 3, 52, 48, 50, 253, 1, 0, 6, 1, 49, 3, 192, 189, 240, 255 })
-    }))
-    
-    -- Pasta
-    Event:FireServer(table.unpack({
-        (function(bytes)
-            local b = buffer.create(#bytes)
-            for i = 1, #bytes do
-                buffer.writeu8(b, i - 1, bytes[i])
-            end
-            return b
-        end)({ 126 }),
-        (function(bytes)
-            local b = buffer.create(#bytes)
-            for i = 1, #bytes do
-                buffer.writeu8(b, i - 1, bytes[i])
-            end
-            return b
-        end)({ 254, 2, 0, 6, 3, 52, 48, 51, 253, 1, 0, 6, 1, 51, 3, 192, 189, 240, 255 })
-    }))
-    
-    -- Meat
-    Event:FireServer(table.unpack({
-        (function(bytes)
-            local b = buffer.create(#bytes)
-            for i = 1, #bytes do
-                buffer.writeu8(b, i - 1, bytes[i])
-            end
-            return b
-        end)({ 126 }),
-        (function(bytes)
-            local b = buffer.create(#bytes)
-            for i = 1, #bytes do
-                buffer.writeu8(b, i - 1, bytes[i])
-            end
-            return b
-        end)({ 254, 2, 0, 6, 3, 52, 48, 50, 253, 1, 0, 6, 1, 53, 3, 192, 189, 240, 255 })
-    }))
-    print("✅ Get Food Executed!")
+    for _, byte in ipairs({126, 118}) do 
+        -- Rice
+        Event:FireServer(table.unpack({
+            (function(bytes)
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ byte }),
+            (function(bytes)
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ 254, 2, 0, 6, 3, 52, 48, 50, 253, 1, 0, 6, 1, 49, 3, 192, 189, 240, 255 })
+        }))
+        
+        -- Pasta
+        Event:FireServer(table.unpack({
+            (function(bytes)
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ byte }),
+            (function(bytes)
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ 254, 2, 0, 6, 3, 52, 48, 51, 253, 1, 0, 6, 1, 51, 3, 192, 189, 240, 255 })
+        }))
+        
+        -- Meat
+        Event:FireServer(table.unpack({
+            (function(bytes)
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ byte }),
+            (function(bytes)
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ 254, 2, 0, 6, 3, 52, 48, 50, 253, 1, 0, 6, 1, 53, 3, 192, 189, 240, 255 })
+        }))
+    end
 end)
 
 -- Feed Lvl Script
 FeedLvlButton.MouseButton1Click:Connect(function()
     if not lvlEnabled then return end
     local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
-    Event:FireServer(table.unpack({
-        (function(bytes)
-            local b = buffer.create(#bytes)
-            for i = 1, #bytes do
-                buffer.writeu8(b, i - 1, bytes[i])
-            end
-            return b
-        end)({ 85 }),
-        (function(bytes)
-            local b = buffer.create(#bytes)
-            for i = 1, #bytes do
-                buffer.writeu8(b, i - 1, bytes[i])
-            end
-            return b
-        end)({ 254, 2, 0, 6, 1, 48, 253, 21, 0, 6, 3, 51, 48, 51, 1, 199, 6, 3, 52, 48, 51, 1, 63, 6, 3, 53, 48, 51, 1, 30, 6, 3, 53, 48, 55, 1, 30, 6, 3, 49, 48, 51, 2, 57, 7, 6, 3, 50, 48, 51, 2, 85, 2, 6, 3, 51, 48, 50, 1, 199, 6, 3, 53, 48, 50, 1, 30, 6, 3, 53, 48, 54, 1, 30, 6, 3, 50, 48, 50, 2, 85, 2, 6, 3, 49, 48, 50, 2, 198, 7, 6, 3, 53, 48, 49, 1, 30, 6, 3, 52, 48, 49, 1, 63, 6, 3, 53, 48, 57, 1, 30, 6, 3, 50, 48, 49, 2, 85, 2, 6, 3, 53, 48, 53, 1, 30, 6, 3, 52, 48, 53, 1, 63, 6, 3, 51, 48, 52, 1, 199, 6, 3, 53, 48, 56, 1, 30, 6, 3, 52, 48, 52, 1, 63, 6, 3, 53, 48, 52, 1, 30 })
-    }))
-    print("✅ Feed Lvl Executed!")
+    for _, byte in ipairs({85, 77}) do 
+        Event:FireServer(table.unpack({
+            (function(bytes)
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ byte }),
+            (function(bytes)
+                local b = buffer.create(#bytes)
+                for i = 1, #bytes do
+                    buffer.writeu8(b, i - 1, bytes[i])
+                end
+                return b
+            end)({ 254, 2, 0, 6, 1, 48, 253, 21, 0, 6, 3, 51, 48, 51, 1, 199, 6, 3, 52, 48, 51, 1, 63, 6, 3, 53, 48, 51, 1, 30, 6, 3, 53, 48, 55, 1, 30, 6, 3, 49, 48, 51, 2, 57, 7, 6, 3, 50, 48, 51, 2, 85, 2, 6, 3, 51, 48, 50, 1, 199, 6, 3, 53, 48, 50, 1, 30, 6, 3, 53, 48, 54, 1, 30, 6, 3, 50, 48, 50, 2, 85, 2, 6, 3, 49, 48, 50, 2, 198, 7, 6, 3, 53, 48, 49, 1, 30, 6, 3, 52, 48, 49, 1, 63, 6, 3, 53, 48, 57, 1, 30, 6, 3, 50, 48, 49, 2, 85, 2, 6, 3, 53, 48, 53, 1, 30, 6, 3, 52, 48, 53, 1, 63, 6, 3, 51, 48, 52, 1, 199, 6, 3, 53, 48, 56, 1, 30, 6, 3, 52, 48, 52, 1, 63, 6, 3, 53, 48, 52, 1, 30 })
+        }))
+    end
 end)
 
 -- Summon 150 Script
 Summon150Button.MouseButton1Click:Connect(function()
     if not summonsEnabled then return end
-    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 63, 83}) do
+    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 83}) do
         local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
         Event:FireServer(table.unpack({
             (function(bytes)
@@ -1001,13 +1003,12 @@ Summon150Button.MouseButton1Click:Connect(function()
             end)({ 254, 2, 0, 6, 1, 50, 1, 150 })
         }))
     end
-    print("✅ Summon 150 Executed!")
 end)
 
 -- Summon 300 Script
 Summon300Button.MouseButton1Click:Connect(function()
     if not summonsEnabled then return end
-    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 63, 83}) do
+    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 83}) do
         local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
         Event:FireServer(table.unpack({
             (function(bytes)
@@ -1042,13 +1043,12 @@ Summon300Button.MouseButton1Click:Connect(function()
             end)({ 254, 2, 0, 6, 1, 50, 2, 44, 1 })
         }))
     end
-    print("✅ Summon 300 Executed!")
 end)
 
 -- Summon 500 Script
 Summon500Button.MouseButton1Click:Connect(function()
     if not summonsEnabled then return end
-    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 63, 83}) do
+    for _, byte in ipairs(game.PlaceId == 139511259501829 and {73, 74} or {71, 83}) do
         local Event = game.PlaceId == 139511259501829 and game:GetService("ReplicatedStorage").TestConfiguration.Try or game:GetService("ReplicatedStorage").Assets.Okay
         Event:FireServer(table.unpack({
             (function(bytes)
@@ -1083,5 +1083,4 @@ Summon500Button.MouseButton1Click:Connect(function()
             end)({ 254, 2, 0, 6, 1, 50, 2, 244, 1 })
         }))
     end
-    print("✅ Summon 500 Executed!")
 end)
