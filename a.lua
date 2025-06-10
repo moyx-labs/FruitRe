@@ -1,4 +1,4 @@
-print("ss")
+print("ssdd")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Event = ReplicatedStorage.Assets.Okay
 
@@ -52,13 +52,19 @@ local function readBuffer(buffer, pos, refs)
 end
 
 -- Hook FireServer
+local enabled = true -- ตั้งเป็น false เพื่อปิด hook
 local oldFireServer
 oldFireServer = hookmetamethod(Event, "__namecall", function(self, ...)
+    if not enabled then
+        return oldFireServer(self, ...)
+    end
     local args = {...}
     if getnamecallmethod() == "FireServer" then
         local success, result = pcall(function()
-            print("Identifier Buffer:", buffer.tostring(args[1]) or "nil")
-            print("Payload Buffer:", buffer.tostring(args[2]) or "nil")
+            print("FireServer called with", #args, "arguments")
+            for i, arg in ipairs(args) do
+                print("Arg", i, ":", typeof(arg), buffer.tostring(arg) or tostring(arg))
+            end
             local payload = args[2]
             if not payload then
                 warn("Payload is nil")
