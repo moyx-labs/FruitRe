@@ -1,4 +1,4 @@
-print("d")
+print("ss")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Event = ReplicatedStorage.Assets.Okay
 
@@ -7,12 +7,15 @@ local function readBuffer(buffer, pos, refs)
     if not buffer then
         return nil, pos, "Buffer is nil"
     end
+    if typeof(buffer) ~= "buffer" then
+        return nil, pos, "Payload is not a buffer: " .. typeof(buffer)
+    end
     if buffer.len(buffer) == 0 then
         return nil, pos, "Buffer is empty"
     end
     local success, typeMarker = pcall(buffer.readi8, buffer, pos)
     if not success then
-        return nil, pos, "Failed to read buffer: " .. typeMarker
+        return nil, pos, "Failed to read buffer: " .. tostring(typeMarker)
     end
     pos = pos + 1
     if typeMarker == 0 then
@@ -44,7 +47,7 @@ local function readBuffer(buffer, pos, refs)
     elseif typeMarker == 2 then
         return buffer.readi16(buffer, pos), pos + 2
     else
-        return nil, pos, "Unsupported type marker: " .. typeMarker
+        return nil, pos, "Unsupported type marker: " .. tostring(typeMarker)
     end
 end
 
@@ -59,6 +62,10 @@ oldFireServer = hookmetamethod(Event, "__namecall", function(self, ...)
             local payload = args[2]
             if not payload then
                 warn("Payload is nil")
+                return
+            end
+            if typeof(payload) ~= "buffer" then
+                warn("Payload is not a buffer: " .. typeof(payload))
                 return
             end
             if buffer.len(payload) == 0 then
@@ -83,7 +90,7 @@ oldFireServer = hookmetamethod(Event, "__namecall", function(self, ...)
             end
         end)
         if not success then
-            warn("Error decoding buffer:", result)
+            warn("Error decoding buffer:", tostring(result))
         end
     end
     return oldFireServer(self, ...)
