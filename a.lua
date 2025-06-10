@@ -1,4 +1,11 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Event = ReplicatedStorage.Assets.Okay
+
+-- ฟังก์ชันถอดรหัส buffer
 local function readBuffer(buffer, pos, refs)
+    if not buffer or buffer.len(buffer) == 0 then
+        return nil, pos, "Empty buffer"
+    end
     local typeMarker = buffer.readi8(buffer, pos)
     pos = pos + 1
     if typeMarker == 0 then
@@ -23,74 +30,46 @@ local function readBuffer(buffer, pos, refs)
             table.insert(array, value)
         end
         return array, pos
-    elseif typeMarker == -3 then
-        local len = buffer.readu16(buffer, pos)
-        pos = pos + 2
-        local tbl = {}
-        for _ = 1, len do
-            local key, value
-            key, pos = readBuffer(buffer, pos, refs)
-            value, pos = readBuffer(buffer, pos, refs)
-            tbl[key] = value
-        end
-        return tbl, pos
-    elseif typeMarker == -4 then
-        local len = buffer.readi8(buffer, pos)
-        local enumName = buffer.readstring(buffer, pos + 1, len)
-        local value = buffer.readu8(buffer, pos + 1 + len)
-        return Enum[enumName]:FromValue(value), pos + 2 + len
-    elseif typeMarker == -5 then
-        local value = buffer.readi16(buffer, pos)
-        return BrickColor.new(value), pos + 2
-    elseif typeMarker == -6 then
-        local len = buffer.readi8(buffer, pos)
-        local enumName = buffer.readstring(buffer, pos + 1, len)
-        return Enum[enumName], pos + 1 + len
-    elseif typeMarker == 1 then
-        return buffer.readu8(buffer, pos), pos + 1
-    elseif typeMarker == 2 then
-        return buffer.readi16(buffer, pos), pos + 2
-    elseif typeMarker == 3 then
-        return buffer.readi32(buffer, pos), pos + 4
-    elseif typeMarker == 4 then
-        return buffer.readf64(buffer, pos), pos + 8
-    elseif typeMarker == 5 then
-        return buffer.readu8(buffer, pos) == 1, pos + 1
     elseif typeMarker == 6 then
         local len = buffer.readu8(buffer, pos)
         local str = buffer.readstring(buffer, pos + 1, len)
         return str, pos + 1 + len
-    elseif typeMarker == 7 then
-        local len = buffer.readu16(buffer, pos)
-        local str = buffer.readstring(buffer, pos + 2, len)
-        return str, pos + 2 + len
-    elseif typeMarker == 8 then
-        local len = buffer.readi32(buffer, pos)
-        local str = buffer.readstring(buffer, pos + 4, len)
-        return str, pos + 4 + len
-    elseif typeMarker == 9 then
-        local x = buffer.readf32(buffer, pos)
-        local y = buffer.readf32(buffer, pos + 4)
-        local z = buffer.readf32(buffer, pos + 8)
-        return Vector3.new(x, y, z), pos + 12
-    elseif typeMarker == 10 then
-        local x = buffer.readf32(buffer, pos)
-        local y = buffer.readf32(buffer, pos + 4)
-        return Vector2.new(x, y), pos + 8
-    elseif typeMarker == 11 then
-        local components = {}
-        for i = 1, 12 do
-            components[i] = buffer.readf32(buffer, pos + (i - 1) * 4)
-        end
-        return CFrame.new(table.unpack(components)), pos + 48
-    elseif typeMarker == 12 then
-        local r = buffer.readu8(buffer, pos)
-        local g = buffer.readu8(buffer, pos + 1)
-        local b = buffer.readu8(buffer, pos + 2)
-        return Color3.fromRGB(r, g, b), pos + 3
+    elseif typeMarker == 2 then
+        return buffer.readi16(buffer, pos), pos + 2
     else
-        error("Unsupported type marker: " .. typeMarker)
+        return nil, pos, "Unsupported type marker: " .. typeMarker
     end
 end
 
-return readBuffer
+-- Hook FireServer
+local oldFireServer
+oldFireServer = hookmetamethod(Event, "__namecall", function(self, ...)
+    local args = {...}
+    if getnamecallmethod() == "FireServer" then
+        local success, result = pcall(function()
+            print("Identifier Buffer:", buffer.tostring(args[1]) or "nil")
+            print("Payload Buffer:", buffer.tostring(args[2]) or "nil")
+            local payload = args[2]
+            if not payload or buffer.len(payload) == 0 then
+                warn("Payload buffer is empty")
+                return
+            end
+            local decoded = {}
+            local pos = 0
+            while pos < buffer.len(payload) do
+                local value, new_pos, err = readBuffer(payload, pos)
+                if err then
+                    warn("Decode error:", err)
+                    break
+                end
+                pos = new_pos
+                table.insert(decoded, tostring(value))
+            end
+            print("Decoded Payload:", table.concat(decoded, ", "))
+        end)
+        if not success then
+            warn("Error decoding buffer:", result)
+        end
+    end
+    return oldFireServer(self, ...)
+end)
