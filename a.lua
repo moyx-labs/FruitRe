@@ -1,12 +1,19 @@
+print("d")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Event = ReplicatedStorage.Assets.Okay
 
 -- ฟังก์ชันถอดรหัส buffer
 local function readBuffer(buffer, pos, refs)
-    if not buffer or buffer.len(buffer) == 0 then
-        return nil, pos, "Empty buffer"
+    if not buffer then
+        return nil, pos, "Buffer is nil"
     end
-    local typeMarker = buffer.readi8(buffer, pos)
+    if buffer.len(buffer) == 0 then
+        return nil, pos, "Buffer is empty"
+    end
+    local success, typeMarker = pcall(buffer.readi8, buffer, pos)
+    if not success then
+        return nil, pos, "Failed to read buffer: " .. typeMarker
+    end
     pos = pos + 1
     if typeMarker == 0 then
         return nil, pos
@@ -50,7 +57,11 @@ oldFireServer = hookmetamethod(Event, "__namecall", function(self, ...)
             print("Identifier Buffer:", buffer.tostring(args[1]) or "nil")
             print("Payload Buffer:", buffer.tostring(args[2]) or "nil")
             local payload = args[2]
-            if not payload or buffer.len(payload) == 0 then
+            if not payload then
+                warn("Payload is nil")
+                return
+            end
+            if buffer.len(payload) == 0 then
                 warn("Payload buffer is empty")
                 return
             end
@@ -65,7 +76,11 @@ oldFireServer = hookmetamethod(Event, "__namecall", function(self, ...)
                 pos = new_pos
                 table.insert(decoded, tostring(value))
             end
-            print("Decoded Payload:", table.concat(decoded, ", "))
+            if #decoded > 0 then
+                print("Decoded Payload:", table.concat(decoded, ", "))
+            else
+                print("No decoded payload")
+            end
         end)
         if not success then
             warn("Error decoding buffer:", result)
